@@ -1,13 +1,18 @@
+package tasks;
+
 import java.util.Objects;
 
 public class Task {
-    private String name;
-    private String description;
-    private int id;
+    // Поля задачи package-private для инкапсуляции
+    String name;
+    String description;
+    int id;
+    // status может принимать значения NEW, IN_PROGRESS, DONE
+    String status;
 
     @Override
     public String toString() {
-        return "Task{" +
+        return "tasks.Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
@@ -15,12 +20,16 @@ public class Task {
                 '}';
     }
 
-    private String status;
-
-    public Task(String name, String description, int id, String status) {
+    // Конструктор общий
+    public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
         this.id = id;
+    }
+
+    // Конструктор задачи
+    public Task(String name, String description, int id, String status) {
+        this(name, description, id);
         this.status = status;
     }
 
