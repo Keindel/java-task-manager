@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subtasks;
-    private String status;
 
     // Конструктор эпиков
     public EpicTask(Task task) {
@@ -80,6 +79,9 @@ public class EpicTask extends Task {
     public String toString() {
         return "EpicTask{" +
                 "subtasks=" + subtasks +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", id=" + id +
                 ", status='" + status + '\'' +
                 '}';
     }

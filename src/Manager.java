@@ -13,33 +13,55 @@ public class Manager {
     /*
     Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
     */
-    public static void makeTask(Object obj) {
+    public static void makeAnyTask(Object obj) {
         if (obj == null) {
             System.out.println("Передана пустая ссылка, не содержащая объекта");
             return;
         }
         String taskType = String.valueOf(obj.getClass());
         switch (taskType) {
-            case "Task":
+            case "class tasks.Task":
                 Task task = (Task) obj;
-                if (task.getId() == 0){
+                if (task.getId() == 0) {
                     task.setId(nextId);
                 }
                 tasks.put(task.getId(), task);
                 nextId++;
                 break;
-            case "SubTask":
+            case "class tasks.SubTask":
                 SubTask subTask = (SubTask) obj;
-                if (subTask.getId() == 0){
-                    subTask.setId(nextId);
-                }
                 int inEpicID = subTask.getInEpicId();
+                /*
+                Если id != 0, то это перезапись (обновление) существующей задачи. В HashMap будет перезапись,
+                а из списка Epic'a SubTask надо именно удалить, а потом добавить снова
+                */
+                if (subTask.getId() == 0) {
+                    subTask.setId(nextId);
+                } else {
+                    if (epicTasks.containsKey(inEpicID)) {
+                        int subTaskId = subTask.getId();
+                        EpicTask parentEpic = epicTasks.get(inEpicID);
+                        for (SubTask subTaskSameId : parentEpic.getThisEpicSubTasks()) {
+                            if (subTaskSameId.getId() == subTaskId) {
+                                parentEpic.removeSubTaskFromEpic(subTaskSameId);
+                                break;
+                            }
+                        }
+                    } else {
+                        System.out.println("Нет эпика с таким id, на который ссылается данная подзадача");
+                        /*
+                        Увеличиваем nextId, т.к. этот блок работает только после вызова
+                        метода updateAnyTask(), в котором предусмотрена команда nextId--
+                        */
+                        nextId++;
+                        return;
+                    }
+                }
+                /*
+                В случае наличия Epic с id соответствующим inEpicID, указанным в этой SubTask,
+                заполняется хэш-таблица subTasks и список subTask'ов в Epic'е
+                */
                 if (epicTasks.containsKey(inEpicID)) {
-                    // todo Здесь в случае обновления через этот метод создания будет проблема
-                    //  со списком subTask в Epic'e. Перед добавлением обновленной subTask в список Epic'a
-                    //  надо удалить старую subTask с тем же id
-                    /* В этом блоке в случае наличия Epic с id соответствующим inEpicID, указанным в этой SubTask,
-                    заполняется хэш-таблица subTasks и список subTask'ов в Epic'е */
                     int subTaskId = subTask.getId();
                     subTasks.put(subTaskId, subTask);
                     // Будем заполнять сразу ссылки (а не id) на SubTask'и в список Epic'а
@@ -47,13 +69,12 @@ public class Manager {
                     parentEpic.putSubTask(subTask);
                     nextId++;
                 } else {
-                    // todo Здесь в случае обновления через этот метод создания будет проблема с nextId
-                    System.out.println("Нет эпика с id, соответствующим данной подзадаче");
+                    System.out.println("Нет эпика с таким id, на который ссылается данная подзадача");
                 }
                 break;
-            case "Epic":
+            case "class tasks.EpicTask":
                 EpicTask epicTask = (EpicTask) obj;
-                if (epicTask.getId() == 0){
+                if (epicTask.getId() == 0) {
                     epicTask.setId(nextId);
                 }
                 epicTasks.put(epicTask.getId(), epicTask);
@@ -69,7 +90,7 @@ public class Manager {
     т.к. по ТЗ обновление реализуется как новая запись поверх старой
      */
     public static void updateAnyTask(Object obj) {
-        makeTask(obj);
+        makeAnyTask(obj);
         // Уменьшаем nextId, т.к. он был увеличен при вызове метода создания
         nextId--;
     }
@@ -149,7 +170,6 @@ public class Manager {
         for (Task task : tasks.values()) {
             tasksListed.add(task);
         }
-        System.out.println("Список задач обычного типа: " + tasksListed);
         return tasksListed;
     }
 
@@ -159,7 +179,6 @@ public class Manager {
         for (SubTask subTask : subTasks.values()) {
             subTasksListed.add(subTask);
         }
-        System.out.println("Список подзадач: " + subTasksListed);
         return subTasksListed;
     }
 
@@ -169,7 +188,6 @@ public class Manager {
         for (EpicTask epicTask : epicTasks.values()) {
             epicTasksListed.add(epicTask);
         }
-        System.out.println("Список эпиков: " + epicTasksListed);
         return epicTasksListed;
     }
 
