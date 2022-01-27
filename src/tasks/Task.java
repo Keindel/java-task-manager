@@ -8,7 +8,15 @@ public class Task {
     // status может принимать значения NEW, IN_PROGRESS, DONE
     String status;
 
-    // Конструктор общий
+    // Конструктор общий для новых задач, без id ()
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.status = "NEW";
+        this.id = 0;
+    }
+
+    // Конструктор общий, без статуса (т.к. статус Epic'a определяется по входящим SubTask'ам)
     public Task(String name, String description, int id) {
         this.name = name;
         this.description = description;
@@ -20,6 +28,7 @@ public class Task {
         this(name, description, id);
         this.status = status;
     }
+
     @Override
     public String toString() {
         return "tasks.Task{" +
@@ -32,6 +41,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getStatus() {

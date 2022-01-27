@@ -9,27 +9,35 @@ public class EpicTask extends Task {
     // Конструктор эпиков
     public EpicTask(Task task) {
         super(task.name, task.description, task.id);
-        this.subtasks = new ArrayList<>();
+        subtasks = new ArrayList<>();
+        // Обновление статуса эпика
+        updateEpicStatus();
     }
 
     // Метод для добавления ссылок на SubTask'и в поле Epic'а со списком
     public void putSubTask(SubTask subTask) {
-        this.subtasks.add(subTask);
+        subtasks.add(subTask);
+        // Обновление статуса эпика
+        updateEpicStatus();
     }
 
     // Getter списка SubTask'ов в Epic'е
     public ArrayList<SubTask> getThisEpicSubTasks() {
-        return this.subtasks;
+        return subtasks;
     }
 
     // Метод очистки списка ссылок на SubTask'и в Epic'е
-    public void clearEpicSublist(){
-        this.subtasks.clear();
+    public void clearEpicSublist() {
+        subtasks.clear();
+        // Обновление статуса эпика
+        updateEpicStatus();
     }
 
     // Метод удаления SubTask'и из Epic'a
-    public void removeSubTaskFromEpic(SubTask subTask){
-        this.subtasks.remove(subTask);
+    public void removeSubTaskFromEpic(SubTask subTask) {
+        subtasks.remove(subTask);
+        // Обновление статуса эпика
+        updateEpicStatus();
     }
 
     // Метод обновления статуса Epic'a
@@ -43,26 +51,36 @@ public class EpicTask extends Task {
                 switch (subTask.getStatus()) {
                     case "NEW":
                         quantityOfNew++;
+                        if (quantityOfDone > 0) {
+                            status = "IN_PROGRESS";
+                            return;
+                        }
                         break;
                     case "DONE":
                         quantityOfDone++;
+                        if (quantityOfNew > 0) {
+                            status = "IN_PROGRESS";
+                            return;
+                        }
                         break;
                     default:
                         status = "IN_PROGRESS";
                         return;
                 }
-                if (quantityOfNew == subtasks.size()){
-                    status = "NEW";
-                } else if (quantityOfDone == subtasks.size()){
-                    status = "DONE";
-                }
+            }
+            if (quantityOfNew == subtasks.size()) {
+                status = "NEW";
+            } else {
+                status = "DONE";
             }
         }
     }
 
-    /*
-    // Getter списка id SubTask'ов в Epic'е
-    public ArrayList<Integer> getSubTasksIds(){
-        return subtasks;
-    }*/
+    @Override
+    public String toString() {
+        return "EpicTask{" +
+                "subtasks=" + subtasks +
+                ", status='" + status + '\'' +
+                '}';
     }
+}

@@ -14,4 +14,11 @@ public class SubTask extends Task {
     public int getInEpicId() {
         return inEpicId;
     }
+
+    @Override
+    public String toString() {
+        return "SubTask{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
