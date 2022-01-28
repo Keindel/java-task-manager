@@ -1,12 +1,14 @@
 package tasks;
 
+import java.util.Objects;
+
 public class Task {
-    // Поля задачи package-private для инкапсуляции
-    String name;
-    String description;
-    int id;
+    // Поля задачи protected для инкапсуляции
+    protected String name;
+    protected String description;
+    protected int id;
     // status может принимать значения NEW, IN_PROGRESS, DONE
-    String status;
+    protected String status;
 
     // Конструктор общий для новых задач, без id ()
     public Task(String name, String description) {
@@ -49,6 +51,19 @@ public class Task {
 
     public String getStatus() {
         return status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
 

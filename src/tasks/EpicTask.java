@@ -1,6 +1,8 @@
 package tasks;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subtasks;
@@ -44,33 +46,15 @@ public class EpicTask extends Task {
         if (subtasks.size() == 0) {
             status = "NEW";
         } else {
-            int quantityOfNew = 0;
-            int quantityOfDone = 0;
+            HashSet<String> uniqueStatuses = new HashSet();
             for (SubTask subTask : subtasks) {
-                switch (subTask.getStatus()) {
-                    case "NEW":
-                        quantityOfNew++;
-                        if (quantityOfDone > 0) {
-                            status = "IN_PROGRESS";
-                            return;
-                        }
-                        break;
-                    case "DONE":
-                        quantityOfDone++;
-                        if (quantityOfNew > 0) {
-                            status = "IN_PROGRESS";
-                            return;
-                        }
-                        break;
-                    default:
-                        status = "IN_PROGRESS";
-                        return;
-                }
+                uniqueStatuses.add(subTask.getStatus());
             }
-            if (quantityOfNew == subtasks.size()) {
-                status = "NEW";
+            if (uniqueStatuses.size() == 1) {
+                Iterator<String> i = uniqueStatuses.iterator();
+                status = i.next();
             } else {
-                status = "DONE";
+                status = "IN_PROGRESS";
             }
         }
     }
