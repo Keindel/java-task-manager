@@ -3,7 +3,7 @@ import tasks.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Manager {
+public class InMemoryTaskManager implements TaskManager {
     private int nextId = 1;
     HashMap<Integer, Task> tasks = new HashMap<>();
     HashMap<Integer, SubTask> subTasks = new HashMap<>();
@@ -12,6 +12,7 @@ public class Manager {
     /*
     Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
     */
+    @Override
     public void makeAnyTask(Object obj) {
         if (obj == null) {
             System.out.println("Передана пустая ссылка, не содержащая объекта");
@@ -101,6 +102,7 @@ public class Manager {
     Метод для обновления задачи любого типа вызывает метод создания,
     т.к. по ТЗ обновление реализуется как новая запись поверх старой
      */
+    @Override
     public void updateAnyTask(Object obj) {
         makeAnyTask(obj);
         // Уменьшаем nextId, т.к. он был увеличен при вызове метода создания
@@ -108,6 +110,7 @@ public class Manager {
     }
 
     // Метод удаления задачи любого типа по идентификатору
+    @Override
     public void deleteAnyTaskById(int id) {
         if (tasks.containsKey(id)) {
             tasks.remove(id);
@@ -137,6 +140,7 @@ public class Manager {
     }
 
     // Метод получения задачи любого типа по идентификатору
+    @Override
     public Task getAnyTaskById(int id) {
         if (tasks.containsKey(id)) {
             return tasks.get(id);
@@ -151,12 +155,14 @@ public class Manager {
     }
 
     // Метод удаления всех задач обычного типа
+    @Override
     public void deleteAllRegularTasks() {
         tasks.clear();
         System.out.println("Все задачи обычного типа удалены");
     }
 
     // Метод удаления всех подзадач
+    @Override
     public void deleteAllSubTasks() {
         // Удаляем ссылки из HashMap
         subTasks.clear();
@@ -168,6 +174,7 @@ public class Manager {
     }
 
     // Метод удаления всех эпиков
+    @Override
     public void deleteAllEpicTasks() {
         // Сначала удаляем все подзадачи эпиков
         deleteAllSubTasks();
@@ -177,21 +184,25 @@ public class Manager {
     }
 
     // Метод для получения списка задач обычного типа
+    @Override
     public ArrayList<Task> getRegularTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     // Метод для получения списка подзадач
+    @Override
     public ArrayList<SubTask> getSubTasks() {
         return new ArrayList<>(subTasks.values());
     }
 
     // Метод для получения списка эпиков
+    @Override
     public ArrayList<EpicTask> getEpicTasks() {
         return new ArrayList<>(epicTasks.values());
     }
 
     // Метод получения списка всех подзадач определённого эпика
+    @Override
     public ArrayList<SubTask> getSubTasksFromEpic(int epicId) {
         return epicTasks.get(epicId).getThisEpicSubTasks();
     }
