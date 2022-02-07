@@ -8,13 +8,13 @@ public class Task {
     protected String description;
     protected int id;
     // status может принимать значения NEW, IN_PROGRESS, DONE
-    protected String status;
+    protected Status status;
 
     // Конструктор общий для новых задач, без id ()
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.status = "NEW";
+        this.status = Status.NEW;
         this.id = 0;
     }
 
@@ -26,7 +26,7 @@ public class Task {
     }
 
     // Конструктор задачи со статусом
-    public Task(String name, String description, int id, String status) {
+    public Task(String name, String description, int id, Status status) {
         this(name, description, id);
         this.status = status;
     }
@@ -49,7 +49,7 @@ public class Task {
         this.id = id;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 

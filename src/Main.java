@@ -43,17 +43,17 @@ public class Main {
         System.out.println("Список подзадач: " + inMemoryTaskManager.getSubTasks());
 
         // Обновление статусов обычных задач
-        Task testTask11 = new Task("", "", 1, "DONE");
-        Task testTask12 = new Task("", "", 2, "IN_PROGRESS");
+        Task testTask11 = new Task("", "", 1, Status.DONE);
+        Task testTask12 = new Task("", "", 2, Status.IN_PROGRESS);
         inMemoryTaskManager.updateAnyTask(testTask11);
         inMemoryTaskManager.updateAnyTask(testTask12);
         System.out.println("Задача с id=1 " + inMemoryTaskManager.getAnyTaskById(1));
         System.out.println("Задача с id=2 " + inMemoryTaskManager.getAnyTaskById(2));
 
         // Обновление статусов подзадач 1го эпика
-        Task testTask14 = new Task("", "", 4, "IN_PROGRESS");
+        Task testTask14 = new Task("", "", 4, Status.IN_PROGRESS);
         SubTask subTask14 = new SubTask(testTask14, 3);
-        Task testTask15 = new Task("", "", 5, "DONE");
+        Task testTask15 = new Task("", "", 5, Status.DONE);
         SubTask subTask15 = new SubTask(testTask15, 3);
         inMemoryTaskManager.updateAnyTask(subTask14);
         inMemoryTaskManager.updateAnyTask(subTask15);
@@ -62,7 +62,7 @@ public class Main {
         System.out.println("Эпик с id=3 " + inMemoryTaskManager.getAnyTaskById(3));
 
         // Обновление статуса подзадачи 2го эпика
-        Task testTask17 = new Task("", "", 7, "DONE");
+        Task testTask17 = new Task("", "", 7, Status.DONE);
         SubTask subTask17 = new SubTask(testTask17, 6);
         inMemoryTaskManager.updateAnyTask(subTask17);
         System.out.println("Подзадача с id=7 " + inMemoryTaskManager.getAnyTaskById(7));
@@ -78,7 +78,7 @@ public class Main {
         System.out.println("Список подзадач после удаления эпика: " + inMemoryTaskManager.getSubTasks());
 
         // Обновление SubTask с несуществующим epicId
-        Task testTask27 = new Task("", "", 7, "IN_PROGRESS");
+        Task testTask27 = new Task("", "", 7, Status.IN_PROGRESS);
         SubTask subTask27 = new SubTask(testTask27, 16);
         inMemoryTaskManager.updateAnyTask(subTask27);
 

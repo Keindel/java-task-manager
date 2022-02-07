@@ -44,17 +44,17 @@ public class EpicTask extends Task {
     // Метод обновления статуса Epic'a
     public void updateEpicStatus() {
         if (subtasks.size() == 0) {
-            status = "NEW";
+            status = Status.NEW;
         } else {
-            HashSet<String> uniqueStatuses = new HashSet();
+            HashSet<Status> uniqueStatuses = new HashSet();
             for (SubTask subTask : subtasks) {
                 uniqueStatuses.add(subTask.getStatus());
             }
             if (uniqueStatuses.size() == 1) {
-                Iterator<String> i = uniqueStatuses.iterator();
+                Iterator<Status> i = uniqueStatuses.iterator();
                 status = i.next();
             } else {
-                status = "IN_PROGRESS";
+                status = Status.IN_PROGRESS;
             }
         }
     }
