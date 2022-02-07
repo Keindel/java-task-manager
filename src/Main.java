@@ -81,5 +81,12 @@ public class Main {
         Task testTask27 = new Task("", "", 7, "IN_PROGRESS");
         SubTask subTask27 = new SubTask(testTask27, 16);
         inMemoryTaskManager.updateAnyTask(subTask27);
+
+        // Просмотр истории
+        System.out.println("История запросов: " + inMemoryTaskManager.getHistory());
+        // Краткий вид истории, по id
+        for (Task task : inMemoryTaskManager.getHistory()) {
+            System.out.println("Краткий вид истории, по id: " + task.getId());
+        }
     }
 }

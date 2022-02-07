@@ -2,16 +2,30 @@ import tasks.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private int nextId = 1;
-    HashMap<Integer, Task> tasks = new HashMap<>();
-    HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HashMap<Integer, EpicTask> epicTasks = new HashMap<>();
+    HashMap<Integer, Task> tasks;
+    HashMap<Integer, SubTask> subTasks;
+    HashMap<Integer, EpicTask> epicTasks;
+    List<Task> history;
+
+    public InMemoryTaskManager() {
+        this.tasks = new HashMap<>();
+        this.subTasks = new HashMap<>();
+        this.epicTasks = new HashMap<>();
+        this.history = new ArrayList<>();
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return history;
+    }
 
     /*
-    Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
-    */
+        Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
+        */
     @Override
     public void makeAnyTask(Object obj) {
         if (obj == null) {
@@ -113,8 +127,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAnyTaskById(int id) {
         if (tasks.containsKey(id)) {
+            history.remove(tasks.get(id));
             tasks.remove(id);
         } else if (subTasks.containsKey(id)) {
+            history.remove(subTasks.get(id));
             SubTask subTask = subTasks.get(id);
             int inEpicId = subTask.getInEpicId();
             // Удаляем ссылку на subTask из списка Epic'a
@@ -127,12 +143,14 @@ public class InMemoryTaskManager implements TaskManager {
             ArrayList<SubTask> subList = getSubTasksFromEpic(id);
             // Удаляем ссылки на SubTask'и Epic'a в HashMap'е SubTask'ов
             for (SubTask subTask : subList) {
+                history.remove(subTask);
                 int subTaskId = subTask.getId();
                 subTasks.remove(subTaskId);
             }
             // Удаляем ссылки на SubTask'и в списке подзадач Epic'a
             subList.clear(); //epicTasks.get(id).clearEpicSublist();
             // Удаляем сам Epic из HashMap;
+            history.remove(epicTasks.get(id));
             epicTasks.remove(id);
         } else {
             System.out.println("Задачи с таким id не существует");
@@ -142,21 +160,38 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод получения задачи любого типа по идентификатору
     @Override
     public Task getAnyTaskById(int id) {
-        if (tasks.containsKey(id)) {
-            return tasks.get(id);
-        } else if (subTasks.containsKey(id)) {
-            return subTasks.get(id);
-        } else if (epicTasks.containsKey(id)) {
-            return epicTasks.get(id);
-        } else {
+        // Для упрощения и читабельности кода сначала общая проверка
+        if (!tasks.containsKey(id) && !subTasks.containsKey(id) && !epicTasks.containsKey(id)) {
             System.out.println("Задачи с таким id не существует");
             return null;
         }
+        // Следующий блок выполняется, если id существует. Поэтому можно корректировать размер списка history
+        if (history.size() >= 10) {
+            history.remove(0);
+        }
+        // Далее работа
+        if (tasks.containsKey(id)) {
+            Task task = tasks.get(id);
+            history.add(task);
+            return task;
+        } else if (subTasks.containsKey(id)) {
+            SubTask subTask = subTasks.get(id);
+            history.add(subTask);
+            return subTask;
+        } else if (epicTasks.containsKey(id)) {
+            EpicTask epicTask = epicTasks.get(id);
+            history.add(epicTask);
+            return epicTasks.get(id);
+        }
+        return null;
     }
 
     // Метод удаления всех задач обычного типа
     @Override
     public void deleteAllRegularTasks() {
+        for (Task task: tasks.values()) {
+            history.remove(task);
+        }
         tasks.clear();
         System.out.println("Все задачи обычного типа удалены");
     }
@@ -164,6 +199,9 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод удаления всех подзадач
     @Override
     public void deleteAllSubTasks() {
+        for (SubTask subTask: subTasks.values()) {
+            history.remove(subTask);
+        }
         // Удаляем ссылки из HashMap
         subTasks.clear();
         // Удаляем ссылки из Epic'ов
@@ -176,6 +214,9 @@ public class InMemoryTaskManager implements TaskManager {
     // Метод удаления всех эпиков
     @Override
     public void deleteAllEpicTasks() {
+        for (EpicTask epicTask: epicTasks.values()) {
+            history.remove(epicTask);
+        }
         // Сначала удаляем все подзадачи эпиков
         deleteAllSubTasks();
         // Теперь удаляем сами Epic'и

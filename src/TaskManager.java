@@ -3,8 +3,13 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
+
+    // Метод просмотра истории задач - возвращать последние 10 просмотренных задач
+    List<Task> getHistory();
+
     /*
         Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
         */
