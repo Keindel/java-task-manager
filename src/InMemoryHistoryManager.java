@@ -1,12 +1,13 @@
 import tasks.Task;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 public class InMemoryHistoryManager implements HistoryManager{
     private List<Task> history;
 
     public InMemoryHistoryManager(){
-        this.history = new ArrayList<>();
+        this.history = new LinkedList<>();
     }
 
     // Метод для удаления из истории - вызывается при удалении задач

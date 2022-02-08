@@ -12,15 +12,15 @@ public class InMemoryTaskManager implements TaskManager {
     // Объявляем переменную менеджера историй
     private InMemoryHistoryManager inMemoryHistoryManager;
 
-    public InMemoryTaskManager() {
+    public InMemoryTaskManager(InMemoryHistoryManager inMemoryHistoryManager) {
         this.tasks = new HashMap<>();
         this.subTasks = new HashMap<>();
         this.epicTasks = new HashMap<>();
-        this.inMemoryHistoryManager = new InMemoryHistoryManager();
+        this.inMemoryHistoryManager = inMemoryHistoryManager;
     }
 
     // Метод получения объекта менеджера истории
-    public InMemoryHistoryManager getInMemoryHistoryManager(){
+    public HistoryManager getInMemoryHistoryManager(){
         return inMemoryHistoryManager;
     }
 

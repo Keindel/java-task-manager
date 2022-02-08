@@ -3,7 +3,8 @@ import tasks.*;
 public class Main {
     public static void main(String[] args) {
         // Тестирование приложения
-        TaskManager taskManager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        TaskManager taskManager = Managers.getDefault(historyManager);
         // 2 задачи для теста
         Task testTask1 = new Task("", "");
         Task testTask2 = new Task("", "");
@@ -83,9 +84,10 @@ public class Main {
         taskManager.updateAnyTask(subTask27);
 
         // Просмотр истории
-        System.out.println("История запросов: " + Managers.getDefaultHistory(taskManager));
+        InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) taskManager;
+        System.out.println("История запросов: " + inMemoryTaskManager.getInMemoryHistoryManager());
         // Краткий вид истории, по id
-        for (Task task : Managers.getDefaultHistory(taskManager).getHistory()) {
+        for (Task task : inMemoryTaskManager.getInMemoryHistoryManager().getHistory()) {
             System.out.println("Краткий вид истории, по id: " + task.getId());
         }
     }
