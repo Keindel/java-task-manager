@@ -1,6 +1,6 @@
 import tasks.Task;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 public class InMemoryHistoryManager implements HistoryManager{
@@ -11,6 +11,7 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     // Метод для удаления из истории - вызывается при удалении задач
+    @Override
     public void remove(Task task){
         history.remove(task);
     }
@@ -24,7 +25,7 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     @Override
-    public List<Task> getHistory() {
+    public Collection<Task> getHistory() {
         return history;
     }
 

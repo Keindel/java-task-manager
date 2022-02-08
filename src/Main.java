@@ -85,9 +85,9 @@ public class Main {
 
         // Просмотр истории
         InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) taskManager;
-        System.out.println("История запросов: " + inMemoryTaskManager.getInMemoryHistoryManager());
+        System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
         // Краткий вид истории, по id
-        for (Task task : inMemoryTaskManager.getInMemoryHistoryManager().getHistory()) {
+        for (Task task : inMemoryTaskManager.getHistoryManager().getHistory()) {
             System.out.println("Краткий вид истории, по id: " + task.getId());
         }
     }
