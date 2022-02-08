@@ -2,8 +2,7 @@ import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public interface TaskManager {
 
@@ -34,14 +33,14 @@ public interface TaskManager {
     void deleteAllEpicTasks();
 
     // Метод для получения списка задач обычного типа
-    ArrayList<Task> getRegularTasks();
+    Collection<Task> getRegularTasks();
 
     // Метод для получения списка подзадач
-    ArrayList<SubTask> getSubTasks();
+    Collection<SubTask> getSubTasks();
 
     // Метод для получения списка эпиков
-    ArrayList<EpicTask> getEpicTasks();
+    Collection<EpicTask> getEpicTasks();
 
     // Метод получения списка всех подзадач определённого эпика
-    ArrayList<SubTask> getSubTasksFromEpic(int epicId);
+    Collection<SubTask> getSubTasksFromEpic(int epicId);
 }
