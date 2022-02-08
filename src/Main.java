@@ -83,9 +83,9 @@ public class Main {
         taskManager.updateAnyTask(subTask27);
 
         // Просмотр истории
-        System.out.println("История запросов: " + taskManager.getHistory());
+        System.out.println("История запросов: " + Managers.getDefaultHistory(taskManager));
         // Краткий вид истории, по id
-        for (Task task : taskManager.getHistory()) {
+        for (Task task : Managers.getDefaultHistory(taskManager).getHistory()) {
             System.out.println("Краткий вид истории, по id: " + task.getId());
         }
     }
