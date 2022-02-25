@@ -43,6 +43,17 @@ public class Main {
         System.out.println("Список обычных задач: " + taskManager.getRegularTasks());
         System.out.println("Список подзадач: " + taskManager.getSubTasks());
 
+        /*
+        Просмотр истории
+        */
+        System.out.println();
+        InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) taskManager;
+        System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
+        // Краткий вид истории, по id
+        for (Task task : inMemoryTaskManager.getHistoryManager().getHistory()) {
+            System.out.println("Краткий вид истории, по id: " + task.getId());
+        }
+
         // Обновление статусов обычных задач
         Task testTask11 = new Task("", "", 1, Status.DONE);
         Task testTask12 = new Task("", "", 2, Status.IN_PROGRESS);
@@ -50,6 +61,16 @@ public class Main {
         taskManager.updateAnyTask(testTask12);
         System.out.println("Задача с id=1 " + taskManager.getAnyTaskById(1));
         System.out.println("Задача с id=2 " + taskManager.getAnyTaskById(2));
+
+        /*
+        Просмотр истории
+        */
+        System.out.println();
+        System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
+        // Краткий вид истории, по id
+        for (Task task : inMemoryTaskManager.getHistoryManager().getHistory()) {
+            System.out.println("Краткий вид истории, по id: " + task.getId());
+        }
 
         // Обновление статусов подзадач 1го эпика
         Task testTask14 = new Task("", "", 4, Status.IN_PROGRESS);
@@ -61,6 +82,16 @@ public class Main {
         System.out.println("Подзадача с id=4 " + taskManager.getAnyTaskById(4));
         System.out.println("Подзадача с id=5 " + taskManager.getAnyTaskById(5));
         System.out.println("Эпик с id=3 " + taskManager.getAnyTaskById(3));
+
+        /*
+        Просмотр истории
+        */
+        System.out.println();
+        System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
+        // Краткий вид истории, по id
+        for (Task task : inMemoryTaskManager.getHistoryManager().getHistory()) {
+            System.out.println("Краткий вид истории, по id: " + task.getId());
+        }
 
         // Обновление статуса подзадачи 2го эпика
         Task testTask17 = new Task("", "", 7, Status.DONE);
@@ -83,8 +114,10 @@ public class Main {
         SubTask subTask27 = new SubTask(testTask27, 16);
         taskManager.updateAnyTask(subTask27);
 
-        // Просмотр истории
-        InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) taskManager;
+        /*
+        Просмотр истории
+        */
+        System.out.println();
         System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
         // Краткий вид истории, по id
         for (Task task : inMemoryTaskManager.getHistoryManager().getHistory()) {

@@ -8,5 +8,5 @@ public interface HistoryManager {
     // Метод просмотра истории задач - возвращать последние 10 просмотренных задач
     Collection<Task> getHistory();
 
-    void remove(Task task);
+    void remove(int id);
 }
