@@ -9,19 +9,19 @@ public interface TaskManager {
     /*
         Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
         */
-    void makeAnyTask(Object obj);
+    void makeTask(Task task);
 
     /*
         Метод для обновления задачи любого типа вызывает метод создания,
         т.к. по ТЗ обновление реализуется как новая запись поверх старой
          */
-    void updateAnyTask(Object obj);
+    void updateTask(Task task);
 
     // Метод удаления задачи любого типа по идентификатору
-    void deleteAnyTaskById(int id);
+    void deleteTaskById(int id);
 
     // Метод получения задачи любого типа по идентификатору
-    Task getAnyTaskById(int id);
+    Task getTaskById(int id);
 
     // Метод удаления всех задач обычного типа
     void deleteAllRegularTasks();

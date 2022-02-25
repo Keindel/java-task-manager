@@ -29,21 +29,21 @@ public class InMemoryTaskManager implements TaskManager {
         Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
         */
     @Override
-    public void makeAnyTask(Object obj) {
-        if (obj == null) {
+    public void makeTask(Task task) {
+        if (task == null) {
             System.out.println("Передана пустая ссылка, не содержащая объекта");
             return;
         }
-        String taskType = String.valueOf(obj.getClass());
+        String taskType = String.valueOf(task.getClass());
         switch (taskType) {
             case "class tasks.Task":
-                saveTask((Task) obj);
+                saveTask(task);
                 break;
             case "class tasks.SubTask":
-                saveSubTask((SubTask) obj);
+                saveSubTask((SubTask) task);
                 break;
             case "class tasks.EpicTask":
-                saveEpicTask((EpicTask) obj);
+                saveEpicTask((EpicTask) task);
                 break;
             default:
                 System.out.println("Передан объект недопустимого класса");
@@ -73,7 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
                 System.out.println("Нет эпика с таким id, на который ссылается данная подзадача");
                 /*
                 Увеличиваем nextId, т.к. этот блок работает только после вызова
-                метода updateAnyTask(), в котором предусмотрена команда nextId--
+                метода updateTask(), в котором предусмотрена команда nextId--
                 */
                 nextId++;
                 return;
@@ -119,15 +119,15 @@ public class InMemoryTaskManager implements TaskManager {
     т.к. по ТЗ обновление реализуется как новая запись поверх старой
      */
     @Override
-    public void updateAnyTask(Object obj) {
-        makeAnyTask(obj);
+    public void updateTask(Task task) {
+        makeTask(task);
         // Уменьшаем nextId, т.к. он был увеличен при вызове метода создания
         nextId--;
     }
 
     // Метод удаления задачи любого типа по идентификатору
     @Override
-    public void deleteAnyTaskById(int id) {
+    public void deleteTaskById(int id) {
         if (tasks.containsKey(id)) {
             historyManager.remove(id);
             tasks.remove(id);
@@ -161,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Метод получения задачи любого типа по идентификатору
     @Override
-    public Task getAnyTaskById(int id) {
+    public Task getTaskById(int id) {
         // Для упрощения и читабельности кода сначала общая проверка
         if (!tasks.containsKey(id) && !subTasks.containsKey(id) && !epicTasks.containsKey(id)) {
             System.out.println("Задачи с таким id не существует");

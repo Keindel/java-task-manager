@@ -34,7 +34,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private List<Task> getTasks() {
         List<Task> history = new ArrayList<>();
-        if (head == null) throw new NoSuchElementException("there's no head Node in history");
+        if (head == null) {
+            throw new NoSuchElementException("there's no head Node in history");
+        }
         Node<Task> iterator = head;
         for (int i = 0; i < historyMap.size(); i++) {
             history.add(iterator.data);
