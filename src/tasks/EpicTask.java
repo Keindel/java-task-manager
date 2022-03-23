@@ -46,7 +46,7 @@ public class EpicTask extends Task {
         if (subtasks.size() == 0) {
             status = Status.NEW;
         } else {
-            HashSet<Status> uniqueStatuses = new HashSet();
+            HashSet<Status> uniqueStatuses = new HashSet<>();
             for (SubTask subTask : subtasks) {
                 uniqueStatuses.add(subTask.getStatus());
             }
@@ -59,14 +59,23 @@ public class EpicTask extends Task {
         }
     }
 
+    public static Task fromString(String value) {
+        String[] taskFields = value.split(",");
+        int id = Integer.parseInt(taskFields[0]);
+        String name = taskFields[2];
+        Status status = Status.valueOf(taskFields[3]);
+        String description = taskFields[4];
+
+        return new EpicTask(new Task(name, description, id, status));
+    }
+
     @Override
     public String toString() {
-        return "EpicTask{" +
-                "subtasks=" + subtasks +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                '}';
+        return String.join(","
+                , String.valueOf(id)
+                , TaskTypes.EPIC.toString()
+                , name
+                , status.toString()
+                , description);
     }
 }

@@ -35,7 +35,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     private List<Task> getTasks() {
         List<Task> history = new ArrayList<>();
         if (head == null) {
-            throw new NoSuchElementException("there's no head Node in history");
+            return List.of();
+            //throw new NoSuchElementException("there's no head Node in history");
         }
         Node<Task> iterator = head;
         for (int i = 0; i < historyMap.size(); i++) {
@@ -92,5 +93,22 @@ public class InMemoryHistoryManager implements HistoryManager {
         return "InMemoryHistoryManager{" +
                 "history=" + getHistory() +
                 '}';
+    }
+
+    static String toStringOfIds(HistoryManager manager) {
+        StringJoiner joiner = new StringJoiner(",");
+        for (Task task : manager.getHistory()) {
+            joiner.add(String.valueOf(task.getId()));
+        }
+        return joiner.toString();
+    }
+
+    static List<Integer> fromString(String value) {
+        String[] historyAsArray = value.split(",");
+        List<Integer> historyFromStringList = new ArrayList<>();
+        for (String s : historyAsArray) {
+            historyFromStringList.add(Integer.parseInt(s));
+        }
+        return historyFromStringList;
     }
 }

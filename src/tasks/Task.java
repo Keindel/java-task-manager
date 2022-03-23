@@ -31,14 +31,25 @@ public class Task {
         this.status = status;
     }
 
+    public static Task fromString(String value) {
+        String[] taskFields = value.split(",");
+        int id = Integer.parseInt(taskFields[0]);
+        String name = taskFields[2];
+        Status status = Status.valueOf(taskFields[3]);
+        String description = taskFields[4];
+
+        return new Task(name, description, id, status);
+    }
+
+
     @Override
     public String toString() {
-        return "tasks.Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status='" + status + '\'' +
-                '}';
+        return String.join(","
+                , String.valueOf(id)
+                , TaskTypes.TASK.toString()
+                , name
+                , status.toString()
+                , description);
     }
 
     public int getId() {
