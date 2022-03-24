@@ -16,7 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.taskManagerDataFile = taskManagerDataFile;
     }
 
-    public void save() throws ManagerSaveException {
+    public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(taskManagerDataFile.toString()))) {
             bufferedWriter.write("id,type,name,status,description,epic");
             List<Task> allTasks = new ArrayList<>(getRegularTasks());

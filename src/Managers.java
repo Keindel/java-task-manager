@@ -1,4 +1,4 @@
-public abstract class Managers {
+public final class Managers {
 
     public static TaskManager getDefault(HistoryManager historyManager) {
         return new InMemoryTaskManager(historyManager);
