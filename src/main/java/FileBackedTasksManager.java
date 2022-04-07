@@ -16,7 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.taskManagerDataFile = taskManagerDataFile;
     }
 
-    public void save() {
+    private void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(taskManagerDataFile.toString()))) {
             bufferedWriter.write("id,type,name,status,description,epic");
             List<Task> allTasks = new ArrayList<>(getRegularTasks());
@@ -36,15 +36,19 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static FileBackedTasksManager loadFromFile(Path path) throws IOException {
         List<String> lines = Files.readAllLines(path);
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        FileBackedTasksManager fileBackedTasksManager
+                = new FileBackedTasksManager(historyManager, path);
+
+        if (lines.size() == 0) return new FileBackedTasksManager(historyManager, path);
+
         lines.remove(0);
         List<Integer> history = InMemoryHistoryManager
                 .fromString(lines.get(lines.size()-1));
         lines.remove(lines.size()-1);
         lines.remove(lines.size()-1);
 
-        HistoryManager historyManager = new InMemoryHistoryManager();
-        FileBackedTasksManager fileBackedTasksManager
-                = new FileBackedTasksManager(historyManager, path);
+
         for (String line : lines) {
             fileBackedTasksManager.loadTask(taskFromString(line));
         }
@@ -56,6 +60,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public static Task taskFromString(String value) {
         String[] taskFields = value.split(",");
+        if (taskFields.length < 2) {
+            throw new IllegalStateException("Unexpected value: " + value);
+        }
         TaskTypes type = TaskTypes.valueOf(taskFields[1]);
 
         switch (type) {
@@ -131,13 +138,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Task testTask2 = new Task("name2", "descr2");
         fileBackedTasksManager.makeTask(testTask1);
         fileBackedTasksManager.makeTask(testTask2);
-        System.out.println(fileBackedTasksManager.getTaskById(1));
-        System.out.println(fileBackedTasksManager.getTaskById(2));
+//        System.out.println(fileBackedTasksManager.getTaskById(1));
+//        System.out.println(fileBackedTasksManager.getTaskById(2));
         // 1ый эпик для теста
         Task testTask3 = new Task("name3", "descr3");
         EpicTask testEpicTask3 = new EpicTask(testTask3);
         fileBackedTasksManager.makeTask(testEpicTask3);
-        System.out.println(fileBackedTasksManager.getTaskById(3));
+//        System.out.println(fileBackedTasksManager.getTaskById(3));
         // 2 подзадачи для 1го эпика
         Task testTask4 = new Task("name4", "descr4");
         Task testTask5 = new Task("name5", "descr5");
@@ -145,20 +152,20 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         SubTask subTask5 = new SubTask(testTask5, 3);
         fileBackedTasksManager.makeTask(subTask4);
         fileBackedTasksManager.makeTask(subTask5);
-        System.out.println(fileBackedTasksManager.getTaskById(4));
-        System.out.println(fileBackedTasksManager.getTaskById(5));
-        System.out.println(fileBackedTasksManager.getTaskById(3));
+//        System.out.println(fileBackedTasksManager.getTaskById(4));
+//        System.out.println(fileBackedTasksManager.getTaskById(5));
+//        System.out.println(fileBackedTasksManager.getTaskById(3));
         // 2ой эпик для теста
         Task testTask6 = new Task("name6", "descr6");
         EpicTask testEpicTask6 = new EpicTask(testTask6);
         fileBackedTasksManager.makeTask(testEpicTask6);
-        System.out.println(fileBackedTasksManager.getTaskById(6));
+//        System.out.println(fileBackedTasksManager.getTaskById(6));
         // 1 подзадача для 2го эпика
         Task testTask7 = new Task("name7", "descr7");
         SubTask subTask7 = new SubTask(testTask7, 6);
         fileBackedTasksManager.makeTask(subTask7);
-        System.out.println(fileBackedTasksManager.getTaskById(7));
-        System.out.println(fileBackedTasksManager.getTaskById(6));
+//        System.out.println(fileBackedTasksManager.getTaskById(7));
+//        System.out.println(fileBackedTasksManager.getTaskById(6));
 
         System.out.println("Список эпиков: " + fileBackedTasksManager.getEpicTasks());
         System.out.println("Список обычных задач: " + fileBackedTasksManager.getRegularTasks());

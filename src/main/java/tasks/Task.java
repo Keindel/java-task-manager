@@ -23,6 +23,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.id = id;
+        this.status = Status.NEW;
     }
 
     // Конструктор задачи со статусом

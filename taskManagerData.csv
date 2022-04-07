@@ -7,4 +7,3 @@ id,type,name,status,description,epic
 5,SUBTASK,name5,NEW,descr5,3
 7,SUBTASK,name7,NEW,descr7,6
 
-1,2,4,5,3,7,6

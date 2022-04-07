@@ -104,8 +104,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     static List<Integer> fromString(String value) {
-        String[] historyAsArray = value.split(",");
         List<Integer> historyFromStringList = new ArrayList<>();
+        if (value.isBlank()) {
+            return historyFromStringList;
+        }
+        String[] historyAsArray = value.split(",");
         for (String s : historyAsArray) {
             historyFromStringList.add(Integer.parseInt(s));
         }
