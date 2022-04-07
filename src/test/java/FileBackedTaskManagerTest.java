@@ -22,7 +22,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     }
 
     @AfterEach
-    public void clearFile() {
+    public void clearFileAfterEach() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(path.toString()))) {
             bufferedWriter.write("");
             //bufferedWriter.flush();
@@ -54,12 +54,22 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
 
     @Test
     public void test101_shouldSaveToFileAndThrowManagerSaveException() throws IOException {
+        //Empty case
+        FileBackedTasksManager managerFromFile = FileBackedTasksManager.loadFromFile(path);
+        checkManagerFromFile(managerFromFile);
+        //Populated case
         populate();
+        //No history case
+        managerFromFile = FileBackedTasksManager.loadFromFile(path);
+        checkManagerFromFile(managerFromFile);
         // 2 задачи для теста
         assertNotNull(manager.getTaskById(1));
         assertNotNull(manager.getTaskById(2));
         // 1ый эпик для теста
         assertNotNull(manager.getTaskById(3));
+        // Epic without subtasks case
+        managerFromFile = FileBackedTasksManager.loadFromFile(path);
+        checkManagerFromFile(managerFromFile);
         // 2 подзадачи для 1го эпика
         assertNotNull(manager.getTaskById(4));
         assertNotNull(manager.getTaskById(5));
@@ -70,19 +80,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         assertNotNull(manager.getTaskById(7));
         assertNotNull(manager.getTaskById(6));
 
-        /*
-        2ой менеджер из файла
-        */
-        FileBackedTasksManager managerFromFile = FileBackedTasksManager.loadFromFile(path);
-        assertEquals(manager.getEpicTasks(), managerFromFile.getEpicTasks());
-        assertEquals(manager.getRegularTasks(), managerFromFile.getRegularTasks());
-        assertEquals(manager.getSubTasks(), managerFromFile.getSubTasks());
-        assertEquals(manager.getHistoryManager().getHistory()
-                , managerFromFile.getHistoryManager().getHistory());
-        // Краткий вид истории, по id
-        assertEquals(InMemoryHistoryManager.toStringOfIds(manager.getHistoryManager())
-                , InMemoryHistoryManager.toStringOfIds(managerFromFile.getHistoryManager()));
+        // 2ой менеджер из файла
+        managerFromFile = FileBackedTasksManager.loadFromFile(path);
+        checkManagerFromFile(managerFromFile);
 
+        //Exception case
         Path emptyPath = Path.of("");
         manager = new FileBackedTasksManager(Managers.getDefaultHistory(), emptyPath);
         assertThrows(
@@ -91,8 +93,18 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         );
     }
 
+    private void checkManagerFromFile(FileBackedTasksManager managerFromFile) {
+        assertEquals(manager.getEpicTasks(), managerFromFile.getEpicTasks());
+        assertEquals(manager.getRegularTasks(), managerFromFile.getRegularTasks());
+        assertEquals(manager.getSubTasks(), managerFromFile.getSubTasks());
+        assertEquals(manager.getHistoryManager().getHistory()
+                , managerFromFile.getHistoryManager().getHistory());
+        assertEquals(InMemoryHistoryManager.toStringOfIds(manager.getHistoryManager())
+                , InMemoryHistoryManager.toStringOfIds(managerFromFile.getHistoryManager()));
+    }
+
     @Test
-    public void shouldLoadFromFileWhenPathExist() throws IOException {
+    public void test102_shouldLoadFromFileWhenPathExist() throws IOException {
         //Populated case is being checked in test101_shouldSaveToFile()
         //This is empty case
         FileBackedTasksManager managerFromFile = FileBackedTasksManager.loadFromFile(path);
@@ -104,7 +116,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     }
 
     @Test
-    public void shouldThrowIOExceptionWhenLoadNotExistingPath() {
+    public void test103_shouldThrowIOExceptionWhenLoadNotExistingPath() {
         Path wrongPath = Path.of("WRONG_PATH");
 
         assertThrows(
@@ -114,7 +126,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     }
 
     @Test
-    public void shouldGetTaskFromStringAndThrowIllegalStateException() {
+    public void test104_shouldGetTaskFromStringAndThrowIllegalStateException() {
         Task task1 = new Task("name1", "descr1");
         Task task1FromString = FileBackedTasksManager.taskFromString(task1.toString());
         assertEquals(task1, task1FromString);
@@ -133,4 +145,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         );
         assertTrue(ex.getMessage().startsWith("Unexpected value: "));
     }
+
+    /*
+    * Дополнительно для FileBackedTasksManager — проверка работы по сохранению и восстановлению состояния. Граничные условия:
+a. Пустой список задач.
+b. Эпик без подзадач.
+c. Пустой список истории.*/
 }

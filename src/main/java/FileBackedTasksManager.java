@@ -16,7 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.taskManagerDataFile = taskManagerDataFile;
     }
 
-    private void save() {
+    public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(taskManagerDataFile.toString()))) {
             bufferedWriter.write("id,type,name,status,description,epic");
             List<Task> allTasks = new ArrayList<>(getRegularTasks());
@@ -46,7 +46,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         List<Integer> history = InMemoryHistoryManager
                 .fromString(lines.get(lines.size()-1));
         lines.remove(lines.size()-1);
-        lines.remove(lines.size()-1);
+        lines.removeIf(String::isBlank);
 
 
         for (String line : lines) {
