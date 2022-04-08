@@ -48,7 +48,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         lines.remove(lines.size()-1);
         lines.removeIf(String::isBlank);
 
-
         for (String line : lines) {
             fileBackedTasksManager.loadTask(taskFromString(line));
         }

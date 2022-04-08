@@ -51,31 +51,29 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void saveEpicTask(EpicTask epicTask) {
-        if (epicTask.getId() == 0) {
+        if (epicTask.getId() <= 0) {
             epicTask.setId(nextId);
+            nextId++;
         }
         epicTasks.put(epicTask.getId(), epicTask);
-        nextId++;
+        incrementNextIdWhileOccupied();
     }
 
     private void saveSubTask(SubTask subTask) {
         int inEpicID = subTask.getInEpicId();
         /*
-        Если id != 0, то это перезапись (обновление) существующей задачи. В HashMap будет перезапись,
-        а из списка Epic'a SubTask надо именно удалить, а потом добавить снова
+        Если такой id уже есть - перезапись (обновление) существующей задачи. В HashMap будет перезапись,
+        а из списка Epic'a SubTask надо именно удалить, а потом добавить снова.
         */
-        if (subTask.getId() == 0) {
+        if (subTask.getId() <= 0) {
             subTask.setId(nextId);
+            nextId++;
+            incrementNextIdWhileOccupied();
         } else {
             if (epicTasks.containsKey(inEpicID)) {
                 removeOldSubTaskFromEpic(subTask, inEpicID);
             } else {
                 System.out.println("Нет эпика с таким id, на который ссылается данная подзадача");
-                /*
-                Увеличиваем nextId, т.к. этот блок работает только после вызова
-                метода updateTask(), в котором предусмотрена команда nextId--
-                */
-                nextId++;
                 return;
             }
         }
@@ -89,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
             // Будем заполнять сразу ссылки (а не id) на SubTask'и в список Epic'а
             EpicTask parentEpic = epicTasks.get(inEpicID);
             parentEpic.putSubTask(subTask);
-            nextId++;
+            incrementNextIdWhileOccupied();
         } else {
             System.out.println("Нет эпика с таким id, на который ссылается данная подзадача");
         }
@@ -107,11 +105,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void saveTask(Task task) {
-        if (task.getId() == 0) {
+        if (task.getId() <= 0) {
             task.setId(nextId);
+            nextId++;
         }
         tasks.put(task.getId(), task);
-        nextId++;
+        incrementNextIdWhileOccupied();
+    }
+
+    private void incrementNextIdWhileOccupied() {
+        while (tasks.containsKey(nextId)
+        || subTasks.containsKey(nextId)
+        || epicTasks.containsKey(nextId)) {
+            nextId++;
+        }
     }
 
     /*
@@ -121,8 +128,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         makeTask(task);
-        // Уменьшаем nextId, т.к. он был увеличен при вызове метода создания
-        nextId--;
     }
 
     // Метод удаления задачи любого типа по идентификатору

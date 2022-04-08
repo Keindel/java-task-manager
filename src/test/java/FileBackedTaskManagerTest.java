@@ -145,10 +145,4 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         );
         assertTrue(ex.getMessage().startsWith("Unexpected value: "));
     }
-
-    /*
-    * Дополнительно для FileBackedTasksManager — проверка работы по сохранению и восстановлению состояния. Граничные условия:
-a. Пустой список задач.
-b. Эпик без подзадач.
-c. Пустой список истории.*/
 }
