@@ -3,6 +3,7 @@ package tasks;
 public class SubTask extends Task {
     // Поле с id эпика, в который вложена subtask
     private int inEpicId;
+    private final TaskTypes taskType = TaskTypes.SUBTASK;
 
     // Конструктор подзадачи содержит дополнительный параметр - inEpicId
     public SubTask(Task task, int epicId) {
@@ -21,19 +22,20 @@ public class SubTask extends Task {
         String name = taskFields[2];
         Status status = Status.valueOf(taskFields[3]);
         String description = taskFields[4];
-        int epicId = Integer.parseInt(taskFields[5]);
+        String startTime = taskFields[5];
+        long duration = Long.parseLong(taskFields[6]);
 
-        return new SubTask(new Task(name, description, id, status), epicId);
+        int epicId = Integer.parseInt(taskFields[taskFields.length-1]);
+
+        return new SubTask(new Task(
+                new Task(name, description, id, status)
+                , startTime, duration)
+                , epicId);
     }
 
     @Override
     public String toString() {
-        return String.join(","
-                , String.valueOf(id)
-                , TaskTypes.SUBTASK.toString()
-                , name
-                , status.toString()
-                , description
+        return String.join(super.toString()
                 , String.valueOf(inEpicId));
     }
 }

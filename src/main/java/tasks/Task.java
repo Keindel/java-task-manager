@@ -1,5 +1,9 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
@@ -9,27 +13,36 @@ public class Task {
     protected int id;
     // status может принимать значения NEW, IN_PROGRESS, DONE
     protected Status status;
+    protected Duration duration;
+    protected LocalDate startTime;
+    private final TaskTypes taskType = TaskTypes.TASK;
 
-    // Конструктор общий для новых задач, без id ()
+    // Базовый конструктор для новых задач, без id ()
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
         this.id = 0;
+        this.duration = Duration.ofDays(1);
+        this.startTime = LocalDate.now();
     }
 
-    // Конструктор общий, без статуса (т.к. статус Epic'a определяется по входящим SubTask'ам)
+    // Конструктор с id
     public Task(String name, String description, int id) {
-        this.name = name;
-        this.description = description;
+        this(name, description);
         this.id = id;
-        this.status = Status.NEW;
     }
 
-    // Конструктор задачи со статусом
+    // Конструктор задачи с id и статусом
     public Task(String name, String description, int id, Status status) {
         this(name, description, id);
         this.status = status;
+    }
+
+    // Конструктор задачи с временем старта и длительностью
+    public Task(Task task, String startTime, long durationInDays) {
+        this.duration = Duration.ofDays(durationInDays);
+        this.startTime = LocalDate.from(getDateTimeFormatter().parse(startTime));
     }
 
     public static Task fromString(String value) {
@@ -38,19 +51,35 @@ public class Task {
         String name = taskFields[2];
         Status status = Status.valueOf(taskFields[3]);
         String description = taskFields[4];
+        if (taskFields[5].isBlank()) {
+            return new Task(name, description, id, status);
+        }
+        String startTime = taskFields[5];
+        long duration = Long.parseLong(taskFields[6]);
 
-        return new Task(name, description, id, status);
+        return new Task(new Task(name, description, id, status)
+                , startTime, duration);
     }
 
+    public static DateTimeFormatter getDateTimeFormatter() {
+        return DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    }
+
+    public LocalDate getEndTime() {
+        return startTime.plus(duration);
+    }
 
     @Override
     public String toString() {
         return String.join(","
                 , String.valueOf(id)
-                , TaskTypes.TASK.toString()
+                , taskType.toString()
                 , name
                 , status.toString()
-                , description);
+                , description
+                , startTime.format(getDateTimeFormatter())
+                , String.valueOf(duration.toDays())
+                , getEndTime().format(getDateTimeFormatter()));
     }
 
     public int getId() {
@@ -78,4 +107,3 @@ public class Task {
         return Objects.hash(id);
     }
 }
-

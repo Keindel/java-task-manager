@@ -1,25 +1,29 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subtasks;
+    private LocalDate endTime;
+    private final TaskTypes taskType = TaskTypes.EPIC;
 
     // Конструктор эпиков
     public EpicTask(Task task) {
         super(task.name, task.description, task.id);
         subtasks = new ArrayList<>();
         // Обновление статуса эпика
-        updateEpicStatus();
+        updateEpic();
     }
 
     // Метод для добавления ссылок на SubTask'и в поле Epic'а со списком
     public void putSubTask(SubTask subTask) {
         subtasks.add(subTask);
         // Обновление статуса эпика
-        updateEpicStatus();
+        updateEpic();
     }
 
     // Getter списка SubTask'ов в Epic'е
@@ -31,18 +35,23 @@ public class EpicTask extends Task {
     public void clearEpicSublist() {
         subtasks.clear();
         // Обновление статуса эпика
-        updateEpicStatus();
+        updateEpic();
     }
 
     // Метод удаления SubTask'и из Epic'a
     public void removeSubTaskFromEpic(SubTask subTask) {
         subtasks.remove(subTask);
         // Обновление статуса эпика
-        updateEpicStatus();
+        updateEpic();
     }
 
     // Метод обновления статуса Epic'a
-    public void updateEpicStatus() {
+    private void updateEpic() {
+        updateStatus();
+        updateTimeAndDuration();
+    }
+
+    private void updateStatus() {
         if (subtasks.size() == 0) {
             status = Status.NEW;
         } else {
@@ -59,6 +68,32 @@ public class EpicTask extends Task {
         }
     }
 
+    private void updateTimeAndDuration() {
+        if (subtasks.size() == 0) {
+            startTime = LocalDate.now();
+            duration = Duration.ofDays(1);
+            endTime = startTime.plus(duration);
+        } else {
+            startTime = subtasks.stream()
+                    .map(x -> x.startTime)
+                    .min(LocalDate::compareTo)
+                    .get();
+            endTime = subtasks.stream()
+                    .map(Task::getEndTime)
+                    .max(LocalDate::compareTo)
+                    .get();
+            duration = Duration.ofDays(subtasks.stream()
+                    .map(x -> x.duration.toDays())
+                    .reduce(Long::sum)
+                    .get());
+        }
+    }
+
+    @Override
+    public LocalDate getEndTime() {
+        return endTime;
+    }
+
     public static Task fromString(String value) {
         String[] taskFields = value.split(",");
         int id = Integer.parseInt(taskFields[0]);
@@ -67,15 +102,5 @@ public class EpicTask extends Task {
         String description = taskFields[4];
 
         return new EpicTask(new Task(name, description, id, status));
-    }
-
-    @Override
-    public String toString() {
-        return String.join(","
-                , String.valueOf(id)
-                , TaskTypes.EPIC.toString()
-                , name
-                , status.toString()
-                , description);
     }
 }

@@ -18,7 +18,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(taskManagerDataFile.toString()))) {
-            bufferedWriter.write("id,type,name,status,description,epic");
+            bufferedWriter.write("id,type,name,status,description,startTime,duration,endTime,epic");
             List<Task> allTasks = new ArrayList<>(getRegularTasks());
             allTasks.addAll(getEpicTasks());
             allTasks.addAll(getSubTasks());
