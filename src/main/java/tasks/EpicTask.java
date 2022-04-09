@@ -1,14 +1,14 @@
 package tasks;
 
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class EpicTask extends Task {
     private ArrayList<SubTask> subtasks;
-    private LocalDate endTime;
+    private LocalDateTime endTime;
     private final TaskTypes taskType = TaskTypes.EPIC;
 
     // Конструктор эпиков
@@ -70,17 +70,17 @@ public class EpicTask extends Task {
 
     private void updateTimeAndDuration() {
         if (subtasks.size() == 0) {
-            startTime = LocalDate.now();
-            duration = Duration.ofDays(1);
-            endTime = startTime.plus(duration);
+            startTime = LocalDateTime.MAX;
+            duration = Duration.ZERO;
+            endTime = startTime.plusDays(duration.toDays());
         } else {
             startTime = subtasks.stream()
                     .map(x -> x.startTime)
-                    .min(LocalDate::compareTo)
+                    .min(LocalDateTime::compareTo)
                     .get();
             endTime = subtasks.stream()
                     .map(Task::getEndTime)
-                    .max(LocalDate::compareTo)
+                    .max(LocalDateTime::compareTo)
                     .get();
             duration = Duration.ofDays(subtasks.stream()
                     .map(x -> x.duration.toDays())
@@ -90,8 +90,21 @@ public class EpicTask extends Task {
     }
 
     @Override
-    public LocalDate getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
+    }
+
+    @Override
+    public String toString() {
+        return String.join(","
+                , String.valueOf(id)
+                , taskType.toString()
+                , name
+                , status.toString()
+                , description
+                , startTime.format(getDateTimeFormatter())
+                , String.valueOf(duration.toDays())
+                , getEndTime().format(getDateTimeFormatter()));
     }
 
     public static Task fromString(String value) {

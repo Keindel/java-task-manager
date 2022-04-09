@@ -35,7 +35,15 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return String.join(super.toString()
+        return String.join(","
+                , String.valueOf(id)
+                , taskType.toString()
+                , name
+                , status.toString()
+                , description
+                , startTime.format(getDateTimeFormatter())
+                , String.valueOf(duration.toDays())
+                , getEndTime().format(getDateTimeFormatter())
                 , String.valueOf(inEpicId));
     }
 }

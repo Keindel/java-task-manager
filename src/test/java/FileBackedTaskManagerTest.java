@@ -84,6 +84,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         managerFromFile = FileBackedTasksManager.loadFromFile(path);
         checkManagerFromFile(managerFromFile);
 
+        //System.out.println(manager.getPrioritizedTasks());
+
         //Exception case
         Path emptyPath = Path.of("");
         manager = new FileBackedTasksManager(Managers.getDefaultHistory(), emptyPath);

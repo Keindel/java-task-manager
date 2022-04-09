@@ -1,9 +1,9 @@
 package tasks;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
 public class Task {
@@ -14,8 +14,10 @@ public class Task {
     // status может принимать значения NEW, IN_PROGRESS, DONE
     protected Status status;
     protected Duration duration;
-    protected LocalDate startTime;
+    protected LocalDateTime startTime;
     private final TaskTypes taskType = TaskTypes.TASK;
+
+    public static final int MINUTES_DISCRETIZATION = 15;
 
     // Базовый конструктор для новых задач, без id ()
     public Task(String name, String description) {
@@ -23,8 +25,8 @@ public class Task {
         this.description = description;
         this.status = Status.NEW;
         this.id = 0;
-        this.duration = Duration.ofDays(1);
-        this.startTime = LocalDate.now();
+        this.duration = Duration.ZERO;
+        this.startTime = LocalDateTime.MAX;
     }
 
     // Конструктор с id
@@ -40,9 +42,19 @@ public class Task {
     }
 
     // Конструктор задачи с временем старта и длительностью
-    public Task(Task task, String startTime, long durationInDays) {
-        this.duration = Duration.ofDays(durationInDays);
-        this.startTime = LocalDate.from(getDateTimeFormatter().parse(startTime));
+    public Task(Task task, String startTime, long durationInMinutes) {
+        if (durationInMinutes < 0) throw new IllegalArgumentException("duration must not be negative");
+        this.duration = Duration.ofMinutes(roundUpByDiscretizator(durationInMinutes));
+        this.startTime = LocalDateTime.from(getDateTimeFormatter().parse(startTime))
+                .plusMinutes(roundUpByDiscretizator(LocalTime
+                        .from(getDateTimeFormatter().parse(startTime)).getMinute()));
+    }
+
+    private long roundUpByDiscretizator(long minutes) {
+        if (minutes % MINUTES_DISCRETIZATION > 0) {
+            minutes = (minutes / MINUTES_DISCRETIZATION) * (MINUTES_DISCRETIZATION + 1);
+        }
+        return minutes;
     }
 
     public static Task fromString(String value) {
@@ -62,11 +74,23 @@ public class Task {
     }
 
     public static DateTimeFormatter getDateTimeFormatter() {
-        return DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return DateTimeFormatter.ofPattern("yy.MM.dd HH:mm");
     }
 
-    public LocalDate getEndTime() {
-        return startTime.plus(duration);
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public long getStartInMinutes() {
+        return startTime.toEpochSecond(ZoneOffset.UTC) / 60;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plusDays(duration.toMinutes());
+    }
+
+    public long getEndInMinutes() {
+        return getEndTime().toEpochSecond(ZoneOffset.UTC) / 60;
     }
 
     @Override
@@ -78,7 +102,7 @@ public class Task {
                 , status.toString()
                 , description
                 , startTime.format(getDateTimeFormatter())
-                , String.valueOf(duration.toDays())
+                , String.valueOf(duration.toMinutes())
                 , getEndTime().format(getDateTimeFormatter()));
     }
 
