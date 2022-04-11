@@ -22,7 +22,7 @@ public interface TaskManager {
     void deleteTaskById(int id);
 
     // Метод получения задачи любого типа по идентификатору
-    Task getSavedTaskById(int id);
+    Task getSavedTaskByIdAndAffectHistory(int id);
 
     // Метод удаления всех задач обычного типа
     void deleteAllRegularTasks();
@@ -45,7 +45,7 @@ public interface TaskManager {
     // Метод получения списка всех подзадач определённого эпика
     Collection<SubTask> getSubTasksFromEpic(int epicId);
 
-    public Set<Task> getPrioritizedTasks();
+    Set<Task> getPrioritizedTasks();
 
 
 }

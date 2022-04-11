@@ -186,11 +186,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTaskById(int id) {
         if (tasks.containsKey(id)) {
-            freeTimeInSchedule(getSavedTaskById(id));
+            Task taskBeingRemoved = tasks.remove(id);
+            freeTimeInSchedule(taskBeingRemoved);
             historyManager.remove(id);
-            tasksAndSubtasksPrioritizedSet.remove(tasks.remove(id));
+            tasksAndSubtasksPrioritizedSet.remove(taskBeingRemoved);
         } else if (subTasks.containsKey(id)) {
-            freeTimeInSchedule(getSavedTaskById(id));
+            SubTask taskBeingRemoved = subTasks.remove(id);
+            freeTimeInSchedule(taskBeingRemoved);
             deleteSubTaskById(id);
         } else if (epicTasks.containsKey(id)) {
             deleteEpicTaskById(id);
@@ -227,16 +229,21 @@ public class InMemoryTaskManager implements TaskManager {
         tasksAndSubtasksPrioritizedSet.remove(subTasks.remove(id));
     }
 
-    // Метод получения задачи любого типа по идентификатору
-    @Override
-    public Task getSavedTaskById(int id) {
-        // Для упрощения и читабельности кода сначала общая проверка
-        if (!tasks.containsKey(id) && !subTasks.containsKey(id) && !epicTasks.containsKey(id)) {
-            System.out.println("Задачи с таким id не существует");
-            return null;
+    private Task getSavedTaskById(int id) {
+        if (tasks.containsKey(id)) {
+            return tasks.get(id);
+        } else if (subTasks.containsKey(id)) {
+            return subTasks.get(id);
+        } else if (epicTasks.containsKey(id)) {
+            return epicTasks.get(id);
         }
-        // Следующий блок выполняется, если id существует. Поэтому можно корректировать размер списка history
-        // Далее основные блоки
+        System.out.println("Задачи с таким id не существует");
+        return null;
+    }
+
+    // Метод получения задачи любого типа по идентификатору с записью в историю
+    @Override
+    public Task getSavedTaskByIdAndAffectHistory(int id) {
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             historyManager.add(task);
@@ -250,6 +257,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(epicTask);
             return epicTasks.get(id);
         }
+        System.out.println("Задачи с таким id не существует");
         return null;
     }
 

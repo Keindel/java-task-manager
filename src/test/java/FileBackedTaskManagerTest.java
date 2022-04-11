@@ -64,22 +64,22 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         managerFromFile = FileBackedTasksManager.loadFromFile(path);
         checkManagerFromFile(managerFromFile);
         // 2 задачи для теста
-        assertNotNull(manager.getSavedTaskById(1));
-        assertNotNull(manager.getSavedTaskById(2));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(1));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(2));
         // 1ый эпик для теста
-        assertNotNull(manager.getSavedTaskById(3));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(3));
         // Epic without subtasks case
         managerFromFile = FileBackedTasksManager.loadFromFile(path);
         checkManagerFromFile(managerFromFile);
         // 2 подзадачи для 1го эпика
-        assertNotNull(manager.getSavedTaskById(4));
-        assertNotNull(manager.getSavedTaskById(5));
-        assertNotNull(manager.getSavedTaskById(3));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(4));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(5));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(3));
         // 2ой эпик для теста
-        assertNotNull(manager.getSavedTaskById(6));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(6));
         // 1 подзадача для 2го эпика
-        assertNotNull(manager.getSavedTaskById(7));
-        assertNotNull(manager.getSavedTaskById(6));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(7));
+        assertNotNull(manager.getSavedTaskByIdAndAffectHistory(6));
 
         // 2ой менеджер из файла
         managerFromFile = FileBackedTasksManager.loadFromFile(path);

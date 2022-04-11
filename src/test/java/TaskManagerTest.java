@@ -128,7 +128,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.makeTask(task);
         Task taskUpdated = new Task("nameUpd", "decripUpd", 1);
         manager.makeTask(taskUpdated);
-        assertEquals(taskUpdated, manager.getSavedTaskById(1));
+        assertEquals(taskUpdated, manager.getSavedTaskByIdAndAffectHistory(1));
     }
 
     @Test
@@ -144,7 +144,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void test13_shouldGetTaskByIdWhenPresent() {
         Task task = new Task("name", "decrip", 1);
         manager.makeTask(task);
-        assertEquals(task, manager.getSavedTaskById(1));
+        assertEquals(task, manager.getSavedTaskByIdAndAffectHistory(1));
     }
 
     @Test
