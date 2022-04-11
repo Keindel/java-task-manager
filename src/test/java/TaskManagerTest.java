@@ -1,8 +1,12 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.EpicTask;
+import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,18 +19,18 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void test1_shouldMakeRegularTaskWhenEmptyList() {
         assertTrue(manager.getRegularTasks().isEmpty());
-        Task task = new Task("name", "decrip", 3);
+        Task task = new Task("name", "decrip", 3, Status.NEW, "22.04.22 09:14", 17);
         manager.makeTask(task);
         assertTrue(manager.getRegularTasks().contains(task));
     }
 
     @Test
     public void test2_shouldMakeRegularTaskWhenNotEmptyList() {
-        Task task = new Task("name", "decrip", 3);
+        Task task = new Task("name", "decrip", 3, Status.NEW, "22.04.22 09:14", 17);
         manager.makeTask(task);
         assertTrue(manager.getRegularTasks().contains(task));
 
-        Task task2 = new Task("name2", "decrip2", 4);
+        Task task2 = new Task("name2", "decrip2", 4, Status.NEW, "22.04.22 10:14", 17);
         manager.makeTask(task2);
         assertTrue(manager.getRegularTasks().contains(task));
         assertTrue(manager.getRegularTasks().contains(task2));
@@ -90,12 +94,21 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void test9_shouldMakeSubTaskWhenNotEmptyList() {
         Task epic = new EpicTask(new Task("name", "decrip", 1));
         manager.makeTask(epic);
-        Task subTask = new SubTask(new Task("name", "decrip", 3), 1);
-        Task subTask2 = new SubTask(new Task("name", "decrip", 4), 1);
+        Task subTask = new SubTask(new Task("name", "decrip", 3, Status.NEW, "22.04.22 09:14", 17), 1);
+        Task subTask2 = new SubTask(new Task("name", "decrip", 4, Status.NEW, "22.04.22 11:14", 37), 1);
         manager.makeTask(subTask);
         manager.makeTask(subTask2);
         assertTrue(manager.getSubTasks().contains(subTask));
         assertTrue(manager.getSubTasks().contains(subTask2));
+
+        assertEquals("22.04.22 09:15", subTask.getStartTime().format(Task.getDateTimeFormatter()));
+        assertEquals("22.04.22 11:15", subTask2.getStartTime().format(Task.getDateTimeFormatter()));
+        assertEquals(30, subTask.getDuration().toMinutes());
+        assertEquals(45, subTask2.getDuration().toMinutes());
+
+        assertEquals("22.04.22 09:15", epic.getStartTime().format(Task.getDateTimeFormatter()));
+        assertEquals("22.04.22 12:00", epic.getEndTime().format(Task.getDateTimeFormatter()));
+        assertEquals(75, epic.getDuration().toMinutes());
     }
 
     @Test
@@ -115,7 +128,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         manager.makeTask(task);
         Task taskUpdated = new Task("nameUpd", "decripUpd", 1);
         manager.makeTask(taskUpdated);
-        assertEquals(taskUpdated, manager.getTaskById(1));
+        assertEquals(taskUpdated, manager.getSavedTaskById(1));
     }
 
     @Test
@@ -131,7 +144,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void test13_shouldGetTaskByIdWhenPresent() {
         Task task = new Task("name", "decrip", 1);
         manager.makeTask(task);
-        assertEquals(task, manager.getTaskById(1));
+        assertEquals(task, manager.getSavedTaskById(1));
     }
 
     @Test
@@ -271,5 +284,47 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(manager.getSubTasksFromEpic(1).contains(subTask1));
         assertTrue(manager.getSubTasksFromEpic(1).contains(subTask2));
         assertTrue(manager.getSubTasksFromEpic(1).contains(subTask3));
+    }
+
+    @Test
+    public void test21_shouldGetPrioritizedTasks() {
+        Task testTask1 = new Task("name1", "descr1", 1, Status.NEW, "22.06.22 09:14", 17);
+        Task testTask2 = new Task("name2", "descr2", 2, Status.NEW, "22.05.22 11:14", 34);
+        manager.makeTask(testTask1);
+        manager.makeTask(testTask2);
+        // 1ый эпик для теста
+        EpicTask testEpicTask3 = new EpicTask(new Task("name3", "descr3", 3));
+        manager.makeTask(testEpicTask3);
+        // 2 подзадачи для 1го эпика
+        SubTask subTask4 = new SubTask(new Task("name4", "descr4", 4, Status.NEW, "22.04.22 13:14", 47), 3);
+        SubTask subTask5 = new SubTask(new Task("name5", "descr5", 5, Status.NEW, "22.04.22 05:14", 71), 3);
+        manager.makeTask(subTask4);
+        manager.makeTask(subTask5);
+        // 2ой эпик для теста
+        EpicTask testEpicTask6 = new EpicTask(new Task("name6", "descr6", 6));
+        manager.makeTask(testEpicTask6);
+        // 1 подзадача для 2го эпика
+        SubTask subTask7 = new SubTask(new Task("name7", "descr7", 7, Status.NEW, "22.04.22 08:14", 189), 6);
+        manager.makeTask(subTask7);
+
+        List<Task> expectedList = new ArrayList<>();
+        expectedList.add(subTask5);
+        expectedList.add(subTask7);
+        expectedList.add(subTask4);
+        expectedList.add(testTask2);
+        expectedList.add(testTask1);
+        assertArrayEquals(expectedList.toArray(), manager.getPrioritizedTasks().toArray());
+    }
+
+    @Test
+    public void test22_shouldThrowIllegalStateExceptionWhenTimeIsNotCompletelyFree() {
+        Task testTask1 = new Task("name1", "descr1", 1, Status.NEW, "22.04.22 09:14", 177);
+        Task testTask2 = new Task("name2", "descr2", 2, Status.NEW, "22.04.22 11:14", 334);
+        manager.makeTask(testTask1);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> manager.makeTask(testTask2));
+        assertEquals("time-period required is not completely free in Schedule",
+                ex.getMessage());
     }
 }

@@ -2,6 +2,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.EpicTask;
+import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
@@ -32,23 +33,23 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
     }
 
     private void populate() {
-        Task testTask1 = new Task("name1", "descr1");
-        Task testTask2 = new Task("name2", "descr2");
+        Task testTask1 = new Task("name1", "descr1", 1, Status.NEW, "22.04.22 09:14", 17);
+        Task testTask2 = new Task("name2", "descr2", 2, Status.NEW, "22.04.22 11:14", 34);
         manager.makeTask(testTask1);
         manager.makeTask(testTask2);
         // 1ый эпик для теста
-        EpicTask testEpicTask3 = new EpicTask(new Task("name3", "descr3"));
+        EpicTask testEpicTask3 = new EpicTask(new Task("name3", "descr3", 3));
         manager.makeTask(testEpicTask3);
         // 2 подзадачи для 1го эпика
-        SubTask subTask4 = new SubTask(new Task("name4", "descr4"), 3);
-        SubTask subTask5 = new SubTask(new Task("name5", "descr5"), 3);
+        SubTask subTask4 = new SubTask(new Task("name4", "descr4", 4, Status.NEW, "22.04.22 13:14", 47), 3);
+        SubTask subTask5 = new SubTask(new Task("name5", "descr5", 5, Status.NEW, "22.04.22 15:14", 71), 3);
         manager.makeTask(subTask4);
         manager.makeTask(subTask5);
         // 2ой эпик для теста
-        EpicTask testEpicTask6 = new EpicTask(new Task("name6", "descr6"));
+        EpicTask testEpicTask6 = new EpicTask(new Task("name6", "descr6", 6));
         manager.makeTask(testEpicTask6);
         // 1 подзадача для 2го эпика
-        SubTask subTask7 = new SubTask(new Task("name7", "descr7"), 6);
+        SubTask subTask7 = new SubTask(new Task("name7", "descr7", 7, Status.NEW, "22.05.22 06:14", 189), 6);
         manager.makeTask(subTask7);
     }
 
@@ -63,22 +64,22 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTasksMa
         managerFromFile = FileBackedTasksManager.loadFromFile(path);
         checkManagerFromFile(managerFromFile);
         // 2 задачи для теста
-        assertNotNull(manager.getTaskById(1));
-        assertNotNull(manager.getTaskById(2));
+        assertNotNull(manager.getSavedTaskById(1));
+        assertNotNull(manager.getSavedTaskById(2));
         // 1ый эпик для теста
-        assertNotNull(manager.getTaskById(3));
+        assertNotNull(manager.getSavedTaskById(3));
         // Epic without subtasks case
         managerFromFile = FileBackedTasksManager.loadFromFile(path);
         checkManagerFromFile(managerFromFile);
         // 2 подзадачи для 1го эпика
-        assertNotNull(manager.getTaskById(4));
-        assertNotNull(manager.getTaskById(5));
-        assertNotNull(manager.getTaskById(3));
+        assertNotNull(manager.getSavedTaskById(4));
+        assertNotNull(manager.getSavedTaskById(5));
+        assertNotNull(manager.getSavedTaskById(3));
         // 2ой эпик для теста
-        assertNotNull(manager.getTaskById(6));
+        assertNotNull(manager.getSavedTaskById(6));
         // 1 подзадача для 2го эпика
-        assertNotNull(manager.getTaskById(7));
-        assertNotNull(manager.getTaskById(6));
+        assertNotNull(manager.getSavedTaskById(7));
+        assertNotNull(manager.getSavedTaskById(6));
 
         // 2ой менеджер из файла
         managerFromFile = FileBackedTasksManager.loadFromFile(path);

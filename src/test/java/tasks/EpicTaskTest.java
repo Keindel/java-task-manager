@@ -30,7 +30,7 @@ class EpicTaskTest {
             + "THEN return epic status based on subtasks statuses")
     @MethodSource("test1MethodSource")
     @ParameterizedTest(name = "{index} epic with status = {1}")
-    void test1_shouldUpdateEpicStatusFromSubtasksStatuses(List<SubTask> subTasks, Status status) {
+    void test1_shouldUpdateEpicFromSubtasks(List<SubTask> subTasks, Status status) {
         //Given
         epicTask = new EpicTask(new Task("epic name", "epic descr", 1));
         //When
@@ -46,8 +46,14 @@ class EpicTaskTest {
                 Arguments.of(List.of(), Status.NEW)
                 , Arguments.of(generateSubTasksListWithStatus(Status.NEW), Status.NEW)
                 , Arguments.of(generateSubTasksListWithStatus(Status.DONE), Status.DONE)
-                , Arguments.of(List.of(new SubTask(new Task("name11", "descrip11", 0, Status.NEW), epicTask.id)
-                                , new SubTask(new Task("name12", "descrip12", 0, Status.DONE), epicTask.id))
+                , Arguments.of(List.of(new SubTask(
+                                                new Task("name11", "descrip11", 0, Status.NEW
+                                                , "22.04.22 09:37", 98)
+                                        , epicTask.id)
+                                , new SubTask(
+                                                new Task("name12", "descrip12", 0, Status.DONE
+                                                , "22.04.22 15:37", 98)
+                                        , epicTask.id))
                         , Status.IN_PROGRESS)
                 , Arguments.of(generateSubTasksListWithStatus(Status.IN_PROGRESS), Status.IN_PROGRESS));
     }
@@ -55,8 +61,10 @@ class EpicTaskTest {
     private List<SubTask> generateSubTasksListWithStatus(Status status) {
         List<SubTask> subTasks = new ArrayList<>();
         for (int i = 1; i < 4; i++) {
-            subTasks.add(new SubTask(new Task("name" + i, "descrip" + i
-                    , epicTask.id + i, status), epicTask.id));
+            subTasks.add(new SubTask(
+                            new Task("name" + i, "descrip" + i, epicTask.id + i, status
+                            , "22.04.22 0" + i * 2 + ":" + (i * 11), 13 * i )
+                    , epicTask.id));
         }
         return subTasks;
     }

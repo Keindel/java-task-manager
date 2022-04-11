@@ -1,5 +1,8 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class SubTask extends Task {
     // Поле с id эпика, в который вложена subtask
     private int inEpicId;
@@ -7,7 +10,8 @@ public class SubTask extends Task {
 
     // Конструктор подзадачи содержит дополнительный параметр - inEpicId
     public SubTask(Task task, int epicId) {
-        super(task.name, task.description, task.id, task.status);
+        super(task.name, task.description, task.id, task.status,
+                task.startTime.format(getDateTimeFormatter()), task.duration.toMinutes());
         this.inEpicId = epicId;
     }
 
@@ -27,9 +31,8 @@ public class SubTask extends Task {
 
         int epicId = Integer.parseInt(taskFields[taskFields.length-1]);
 
-        return new SubTask(new Task(
-                new Task(name, description, id, status)
-                , startTime, duration)
+        return new SubTask(
+                new Task(name, description, id, status, startTime, duration)
                 , epicId);
     }
 

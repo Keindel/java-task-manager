@@ -81,7 +81,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private void loadTaskById(int id) {
-        super.getTaskById(id);
+        super.getSavedTaskById(id);
     }
 
     @Override
@@ -121,8 +121,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTaskById(int id) {
-        Task task = super.getTaskById(id);
+    public Task getSavedTaskById(int id) {
+        Task task = super.getSavedTaskById(id);
         save();
         return task;
     }

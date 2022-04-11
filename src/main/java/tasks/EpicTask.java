@@ -82,8 +82,8 @@ public class EpicTask extends Task {
                     .map(Task::getEndTime)
                     .max(LocalDateTime::compareTo)
                     .get();
-            duration = Duration.ofDays(subtasks.stream()
-                    .map(x -> x.duration.toDays())
+            duration = Duration.ofMinutes(subtasks.stream()
+                    .map(x -> x.duration.toMinutes())
                     .reduce(Long::sum)
                     .get());
         }

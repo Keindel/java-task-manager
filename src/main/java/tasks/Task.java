@@ -2,8 +2,6 @@ package tasks;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 import java.util.Objects;
 
 public class Task {
@@ -42,17 +40,19 @@ public class Task {
     }
 
     // Конструктор задачи с временем старта и длительностью
-    public Task(Task task, String startTime, long durationInMinutes) {
+    public Task(String name, String description, int id, Status status, String startTime, long durationInMinutes) {
+        this(name, description, id, status);
         if (durationInMinutes < 0) throw new IllegalArgumentException("duration must not be negative");
         this.duration = Duration.ofMinutes(roundUpByDiscretizator(durationInMinutes));
         this.startTime = LocalDateTime.from(getDateTimeFormatter().parse(startTime))
+                .withMinute(0)
                 .plusMinutes(roundUpByDiscretizator(LocalTime
                         .from(getDateTimeFormatter().parse(startTime)).getMinute()));
     }
 
     private long roundUpByDiscretizator(long minutes) {
         if (minutes % MINUTES_DISCRETIZATION > 0) {
-            minutes = (minutes / MINUTES_DISCRETIZATION) * (MINUTES_DISCRETIZATION + 1);
+            minutes = (minutes / MINUTES_DISCRETIZATION + 1) * (MINUTES_DISCRETIZATION);
         }
         return minutes;
     }
@@ -69,7 +69,7 @@ public class Task {
         String startTime = taskFields[5];
         long duration = Long.parseLong(taskFields[6]);
 
-        return new Task(new Task(name, description, id, status)
+        return new Task(name, description, id, status
                 , startTime, duration);
     }
 
@@ -81,12 +81,16 @@ public class Task {
         return startTime;
     }
 
+    public Duration getDuration() {
+        return duration;
+    }
+
     public long getStartInMinutes() {
         return startTime.toEpochSecond(ZoneOffset.UTC) / 60;
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plusDays(duration.toMinutes());
+        return startTime.plusMinutes(duration.toMinutes());
     }
 
     public long getEndInMinutes() {

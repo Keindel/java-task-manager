@@ -21,7 +21,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
     }
 
     @Test
-    public void shouldGoOverExistingIdForIncomingTasksWithoutIds(){
+    public void shouldGoOverExistingIdsForIncomingTasksWithoutIds(){
         assertEquals(0, manager.getRegularTasks().size());
         manager.makeTask(new Task("abc", "bcd", 2));
         assertEquals(1, manager.getRegularTasks().size());

@@ -3,6 +3,7 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.Collection;
+import java.util.Set;
 
 public interface TaskManager {
 
@@ -21,7 +22,7 @@ public interface TaskManager {
     void deleteTaskById(int id);
 
     // Метод получения задачи любого типа по идентификатору
-    Task getTaskById(int id);
+    Task getSavedTaskById(int id);
 
     // Метод удаления всех задач обычного типа
     void deleteAllRegularTasks();
@@ -43,4 +44,8 @@ public interface TaskManager {
 
     // Метод получения списка всех подзадач определённого эпика
     Collection<SubTask> getSubTasksFromEpic(int epicId);
+
+    public Set<Task> getPrioritizedTasks();
+
+
 }
