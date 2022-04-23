@@ -158,7 +158,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void freeTimeInSchedule(Task task) {
-        if (task instanceof EpicTask) return;
+        if (task == null || task instanceof EpicTask) return;
         if (task.getStartTime().isEqual(LocalDateTime.MAX)) {
             return;
         }
