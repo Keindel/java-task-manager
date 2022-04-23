@@ -1,6 +1,4 @@
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -13,8 +11,11 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
-import com.google.gson.Gson;
+import gsonAdapters.DurationAdapter;
+import gsonAdapters.LocalDateTimeAdapter;
 import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
@@ -22,7 +23,10 @@ import tasks.Task;
 public class HttpTaskServer {
     private static final int PORT = 8081;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-    private static Gson gson = new Gson();
+    private static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new DurationAdapter())
+            .create();
 
     private static HistoryManager historyManager = Managers.getDefaultHistory();
     //    private static TaskManager taskManager = Managers.getDefault(historyManager);
@@ -44,6 +48,13 @@ public class HttpTaskServer {
 
     public static void main(String[] args) {
         startTaskServer();
+        try {
+            taskManager = FileBackedTasksManager.loadFromFile(Path.of("taskManagerData.csv"));
+            FileBackedTasksManager fileBackedTasksManager = (FileBackedTasksManager) taskManager;
+            historyManager = fileBackedTasksManager.getHistoryManager();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void startTaskServer() {
@@ -73,7 +84,7 @@ public class HttpTaskServer {
 
             int id = 0;
             if (uriQuery != null && !uriQuery.isBlank()) {
-                endpoint = endpoint + "?" + Integer.parseInt(uriQuery.split("=")[0]);
+                endpoint = endpoint + "?" + uriQuery.split("=")[0];
                 id = Integer.parseInt(uriQuery.split("=")[1]);
             }
             if (endpoint.endsWith("/")) {
@@ -88,49 +99,6 @@ public class HttpTaskServer {
             }
             statusCode = defineStatusCode(requestMethod);
 
-            response = handleEndpoint(response, endpoint, id, requestBody);
-            giveResponse(httpExchange, response, statusCode);
-//  GET /tasks/task/                    Collection<Task> getRegularTasks();
-//  GET /tasks/task/?id=                Task getSavedTaskByIdAndAffectHistory(int id);
-//  POST/tasks/task/ Body:{task ..}     void makeTask(Task task); void updateTask(Task task);
-//
-//  DELETE/tasks/task/?id=              void deleteTaskById(int id);
-//  DELETE/tasks/task                   void deleteAllRegularTasks();
-//
-//  GET /tasks/subtask/                 Collection<SubTask> getSubTasks();
-//  DELETE/tasks/subtask                void deleteAllSubTasks();
-//
-//  GET /tasks/epic/                    Collection<EpicTask> getEpicTasks();
-//  DELETE/tasks/epic                   void deleteAllEpicTasks();
-//
-//  GET /tasks/subtask/epic/?id=        Collection<SubTask> getSubTasksFromEpic(int epicId);
-//  GET /tasks/history
-//  GET /tasks/                         Set<Task> getPrioritizedTasks();
-
-
-
-/*
-* Сначала добавьте в проект библиотеку Gson для работы с JSON. Далее создайте класс HttpTaskServer,
-*  который будет слушать порт 8080 и принимать запросы. Добавьте в него реализациюBackedFileTaskManager,
-*  которую можно получить из утилитного класса Managers. После этого можно
-*  реализовать маппинг запросов на методы интерфейса TaskManager.
-*
-API должен работать так, чтобы все запросы по пути /tasks/<ресурсы> приходили в интерфейс TaskManager.
-*  Путь для обычных задач — /tasks/task, для подзадач — /tasks/subtask, для эпиков — /tasks/epic.
-*  Получить все задачи сразу можно будет по пути /tasks/, а получить историю задач по пути /tasks/history.
-
-* Для получения данных должны быть GET-запросы. Для создания и изменения — POST-запросы.
-*  Для удаления — DELETE-запросы. Задачи передаются в теле запроса в формате JSON.
-*  Идентификатор (id) задачи следует передавать параметром запроса (через вопросительный знак).
-
-* В результате для каждого метода интерфейса TaskManager должен быть создан отдельный эндпоинт,
-*  который можно будет вызвать по HTTP.
-*
-*
-* */
-        }
-
-        private String handleEndpoint(String response, String endpoint, int id, String requestBody) {
             switch (endpoint) {
                 case "GET/tasks/task":
                     response = gson.toJson(taskManager.getRegularTasks());
@@ -148,7 +116,8 @@ API должен работать так, чтобы все запросы по 
                     response = gson.toJson(taskManager.getPrioritizedTasks());
                     break;
                 case "GET/tasks/history":
-                    response = gson.toJson(historyManager.getHistory());
+//                    response = gson.toJson(historyManager.getHistory());
+                    response = gson.toJson(InMemoryHistoryManager.toStringOfIds(historyManager));
                     break;
                 case "GET/tasks/subtask/epic/?id":
                     response = gson.toJson(taskManager.getSubTasksFromEpic(id));
@@ -186,8 +155,10 @@ API должен работать так, чтобы все запросы по 
                     taskManager.deleteAllSubTasks();
                     break;
                 default:
+                    statusCode = 400;
             }
-            return response;
+
+            giveResponse(httpExchange, response, statusCode);
         }
 
         private int defineStatusCode(String requestMethod) {

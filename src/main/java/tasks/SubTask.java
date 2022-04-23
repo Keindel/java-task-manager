@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 public class SubTask extends Task {
     // Поле с id эпика, в который вложена subtask
     private int inEpicId;
-    private final TaskTypes taskType = TaskTypes.SUBTASK;
 
     // Конструктор подзадачи содержит дополнительный параметр - inEpicId
     public SubTask(Task task, int epicId) {
         super(task.name, task.description, task.id, task.status,
                 task.startTime.format(getDateTimeFormatter()), task.duration.toMinutes());
         this.inEpicId = epicId;
+        this.taskType = TaskTypes.SUBTASK;
     }
 
     // Getter поля inEpicId

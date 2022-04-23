@@ -9,12 +9,12 @@ import java.util.Iterator;
 public class EpicTask extends Task {
     private ArrayList<SubTask> subtasks;
     private LocalDateTime endTime;
-    private final TaskTypes taskType = TaskTypes.EPIC;
 
     // Конструктор эпиков
     public EpicTask(Task task) {
         super(task.name, task.description, task.id);
         subtasks = new ArrayList<>();
+        this.taskType = TaskTypes.EPIC;
         // Обновление статуса эпика
         updateEpic();
     }

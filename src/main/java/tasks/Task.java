@@ -13,7 +13,7 @@ public class Task {
     protected Status status;
     protected Duration duration;
     protected LocalDateTime startTime;
-    private final TaskTypes taskType = TaskTypes.TASK;
+    protected TaskTypes taskType;
 
     public static final int MINUTES_DISCRETIZATION = 15;
 
@@ -24,7 +24,8 @@ public class Task {
         this.status = Status.NEW;
         this.id = 0;
         this.duration = Duration.ZERO;
-        this.startTime = LocalDateTime.MAX;
+        this.startTime = LocalDateTime.MAX.minusYears(1);
+        this.taskType = TaskTypes.TASK;
     }
 
     // Конструктор с id
@@ -63,7 +64,7 @@ public class Task {
         String name = taskFields[2];
         Status status = Status.valueOf(taskFields[3]);
         String description = taskFields[4];
-        if (taskFields[5].isBlank()) {
+        if (taskFields.length <= 5 || taskFields[5].isBlank()) {
             return new Task(name, description, id, status);
         }
         String startTime = taskFields[5];

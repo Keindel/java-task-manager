@@ -1,9 +1,11 @@
-id,type,name,status,description,epic
-1,TASK,name1,NEW,descr1
-2,TASK,name2,NEW,descr2
-3,EPIC,name3,NEW,descr3
-6,EPIC,name6,NEW,descr6
-4,SUBTASK,name4,NEW,descr4,3
-5,SUBTASK,name5,NEW,descr5,3
-7,SUBTASK,name7,NEW,descr7,6
+id,type,name,status,description,startTime,duration,endTime,epic
+1,TASK,name1,NEW,descr1,99.01.01 00:00,0,99.01.01 00:00
+2,TASK,name2,NEW,descr2,99.01.01 00:00,0,99.01.01 00:00
+18,TASK,18,NEW,18,99.01.01 00:00,0,99.01.01 00:00
+3,EPIC,name3,NEW,descr3,99.01.01 00:00,0,99.01.01 00:00
+6,EPIC,name6,NEW,descr6,99.01.01 00:00,0,99.01.01 00:00
+4,SUBTASK,name4,NEW,descr4,99.01.01 00:00,0,99.01.01 00:00,3
+5,SUBTASK,name5,NEW,descr5,99.01.01 00:00,0,99.01.01 00:00,3
+7,SUBTASK,name7,NEW,descr7,99.01.01 00:00,0,99.01.01 00:00,6
 
+2,18
