@@ -9,6 +9,13 @@ import java.util.Map;
 /**
  * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
  */
+/*
+* Вам нужно дописать реализацию запроса load() — это метод, который отвечает за получение данных.
+*  Доделайте логику работы сервера по комментариям (комментарии затем можно убрать).
+*  После этого запустите сервер и проверьте, что получение значения по ключу работает.
+*  Для начальной отладки можно делать запросы без авторизации, используя код DEBUG.
+* */
+
 public class KVServer {
     public static final int PORT = 8078;
     private final String API_KEY;
@@ -68,7 +75,37 @@ public class KVServer {
             }
         });
         server.createContext("/load", (h) -> {
-            // TODO Добавьте получение значения по ключу
+            try {
+                System.out.println("\n/load");
+                if (!hasAuth(h)) {
+                    System.out.println("Запрос неавторизован, нужен параметр в query API_KEY со значением апи-ключа");
+                    h.sendResponseHeaders(403, 0);
+                    return;
+                }
+                switch (h.getRequestMethod()) {
+                    case "GET":
+                        String key = h.getRequestURI().getPath().substring("/load/".length());
+                        if (key.isEmpty()) {
+                            System.out.println("Key пустой. key указывается в пути: /save/{key}");
+                            h.sendResponseHeaders(400, 0);
+                            return;
+                        }
+                        if (data.get(key) == null) {
+                            System.out.println("Такого ключа нет");
+                            h.sendResponseHeaders(400, 0);
+                            return;
+                        }
+                        sendText(h, data.get(key));
+                        System.out.println("Значение для ключа " + key + " успешно отправлено!");
+                        h.sendResponseHeaders(200, 0);
+                        break;
+                    default:
+                        System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+                        h.sendResponseHeaders(405, 0);
+                }
+            } finally {
+                h.close();
+            }
         });
     }
 
@@ -98,5 +135,9 @@ public class KVServer {
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
+    }
+
+    public static void main(String[] args) throws IOException {
+        new KVServer().start();
     }
 }
