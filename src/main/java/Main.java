@@ -1,10 +1,20 @@
 import tasks.*;
 
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        KVServer kvServer = new KVServer();
+        kvServer.start();
+
+        HTTPTaskServer httpTaskServer = new HTTPTaskServer();
+        HTTPTaskServer.startTaskServer();
+
         // Тестирование приложения
-        HistoryManager historyManager = Managers.getDefaultHistory();
-        TaskManager taskManager = Managers.getDefault(historyManager);
+//        HistoryManager historyManager = Managers.getDefaultHistory();
+//        TaskManager taskManager = Managers.getDefault(historyManager, url);
+//        TaskManager taskManager = Managers.getDefault(historyManager);
+        TaskManager taskManager = HTTPTaskServer.getTaskManager();
         // 2 задачи для теста
         Task testTask1 = new Task("", "");
         Task testTask2 = new Task("", "");
@@ -43,9 +53,8 @@ public class Main {
         System.out.println("Список обычных задач: " + taskManager.getRegularTasks());
         System.out.println("Список подзадач: " + taskManager.getSubTasks());
 
-        /*
-        Просмотр истории
-        */
+
+        //Просмотр истории
         System.out.println();
         InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) taskManager;
         System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
@@ -62,9 +71,8 @@ public class Main {
         System.out.println("Задача с id=1 " + taskManager.getSavedTaskByIdAndAffectHistory(1));
         System.out.println("Задача с id=2 " + taskManager.getSavedTaskByIdAndAffectHistory(2));
 
-        /*
-        Просмотр истории
-        */
+
+        //Просмотр истории
         System.out.println();
         System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
         // Краткий вид истории, по id
@@ -83,9 +91,8 @@ public class Main {
         System.out.println("Подзадача с id=5 " + taskManager.getSavedTaskByIdAndAffectHistory(5));
         System.out.println("Эпик с id=3 " + taskManager.getSavedTaskByIdAndAffectHistory(3));
 
-        /*
-        Просмотр истории
-        */
+
+        //Просмотр истории
         System.out.println();
         System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
         // Краткий вид истории, по id
@@ -114,9 +121,8 @@ public class Main {
         SubTask subTask27 = new SubTask(testTask27, 16);
         taskManager.updateTask(subTask27);
 
-        /*
-        Просмотр истории
-        */
+
+        //Просмотр истории
         System.out.println();
         System.out.println("История запросов: " + inMemoryTaskManager.getHistoryManager());
         // Краткий вид истории, по id

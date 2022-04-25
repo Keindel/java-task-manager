@@ -39,7 +39,7 @@ public class KVTaskClient {
                         + httpResponse.statusCode());
             }
         } catch (NullPointerException | IOException | InterruptedException e) {
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
+            System.out.println("Во время выполнения запроса KVTaskClient.receiveAPI_KEY() возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
     }

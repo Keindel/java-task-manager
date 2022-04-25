@@ -20,7 +20,7 @@ import tasks.EpicTask;
 import tasks.SubTask;
 import tasks.Task;
 
-public class HttpTaskServer {
+public class HTTPTaskServer {
     private static final int PORT = 8081;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static Gson gson = new GsonBuilder()
@@ -29,10 +29,14 @@ public class HttpTaskServer {
             .create();
 
     private static HistoryManager historyManager = Managers.getDefaultHistory();
-    //    private static TaskManager taskManager = Managers.getDefault(historyManager);
-    private static TaskManager taskManager
-            = new FileBackedTasksManager(historyManager, Path.of("taskManagerData.csv"));
+        private static TaskManager taskManager = Managers.getDefault(historyManager, "http://localhost:" + KVServer.PORT);
+//    private static TaskManager taskManager
+//            = new FileBackedTasksManager(historyManager, Path.of("taskManagerData.csv"));
     private static HttpServer httpServer;
+
+    public static TaskManager getTaskManager() {
+        return taskManager;
+    }
 
     static {
         try {
@@ -58,14 +62,14 @@ public class HttpTaskServer {
         }
     }
 
-    private static void startTaskServer() {
+    public static void startTaskServer() {
         httpServer.start();
-        System.out.println("Server started on " + PORT);
+        System.out.println("TaskServer started on " + PORT);
     }
 
-    private static void stopTaskServer() {
+    public static void stopTaskServer() {
         httpServer.stop(0);
-        System.out.println("Server stopped on " + PORT);
+        System.out.println("TaskServer stopped on " + PORT);
     }
 
     static class TasksHandler implements HttpHandler {
