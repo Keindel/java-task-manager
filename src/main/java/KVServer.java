@@ -1,5 +1,7 @@
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import org.ietf.jgss.GSSContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,18 +11,13 @@ import java.util.Map;
 /**
  * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
  */
-/*
-* Вам нужно дописать реализацию запроса load() — это метод, который отвечает за получение данных.
-*  Доделайте логику работы сервера по комментариям (комментарии затем можно убрать).
-*  После этого запустите сервер и проверьте, что получение значения по ключу работает.
-*  Для начальной отладки можно делать запросы без авторизации, используя код DEBUG.
-* */
 
 public class KVServer {
     public static final int PORT = 8078;
     private final String API_KEY;
     private HttpServer server;
     private Map<String, String> data = new HashMap<>();
+    private static final Gson gson = new Gson();
 
     public KVServer() throws IOException {
         API_KEY = generateApiKey();
@@ -91,7 +88,7 @@ public class KVServer {
                             return;
                         }
                         if (data.get(key) == null) {
-                            System.out.println("Такого ключа нет");
+                            System.out.println("Такой ключ пока не внесен в хранилище");
                             h.sendResponseHeaders(400, 0);
                             return;
                         }
@@ -131,6 +128,7 @@ public class KVServer {
 
     protected void sendText(HttpExchange h, String text) throws IOException {
         //byte[] resp = jackson.writeValueAsBytes(obj);
+        text = gson.toJson(text);
         byte[] resp = text.getBytes("UTF-8");
         h.getResponseHeaders().add("Content-Type", "application/json");
         h.sendResponseHeaders(200, resp.length);
@@ -139,5 +137,16 @@ public class KVServer {
 
     public static void main(String[] args) throws IOException {
         new KVServer().start();
+        KVTaskClient kvTaskClient = new KVTaskClient("http://localhost:" + PORT);
+        kvTaskClient.put("door%20key", "{\"door\": \"lock\"}");
+        kvTaskClient.put("gate%20key", "{\"gate\": \"lock\"}");
+        System.out.println(kvTaskClient.load("door%20key"));
+        System.out.println(kvTaskClient.load("gate%20key"));
+
+        kvTaskClient.put("door%20key", "{\"door\": \"lock update\"}");
+        kvTaskClient.put("gate%20key", "{\"gate\": \"lock update\"}");
+
+        System.out.println(kvTaskClient.load("door%20key"));
+        System.out.println(kvTaskClient.load("gate%20key"));
     }
 }
