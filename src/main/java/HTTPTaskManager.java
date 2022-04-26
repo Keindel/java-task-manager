@@ -4,9 +4,10 @@ import gsonAdapters.DurationAdapter;
 import gsonAdapters.LocalDateTimeAdapter;
 import tasks.Task;
 
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HTTPTaskManager extends FileBackedTasksManager {
     private final KVTaskClient kvTaskClient;
@@ -20,13 +21,14 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         this.kvTaskClient = new KVTaskClient(url);
     }
 
-    public KVTaskClient getKvTaskClient() {
-        return kvTaskClient;
-    }
-
     @Override
     public void save() {
-        kvTaskClient.put("tasks", gson.toJson(getPrioritizedTasks()));
+        List<Task> allTasks = new ArrayList<>(getRegularTasks());
+        allTasks.addAll(getEpicTasks());
+        allTasks.addAll(getSubTasks());
+        kvTaskClient.put("tasks", gson.toJson(allTasks));
+        kvTaskClient.put("history", gson.toJson(InMemoryHistoryManager
+                .toStringOfIds(this.getHistoryManager())));
     }
     /*
      * Конструктор HTTPTaskManager должен будет вместо имени файла принимать URL к серверу KVServer.

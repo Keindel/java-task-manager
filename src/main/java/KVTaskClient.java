@@ -71,7 +71,6 @@ public class KVTaskClient {
         try {
             final HttpResponse<String> httpResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
             if (httpResponse.statusCode() == 200) {
-                // TODO Check this code
                 //JsonObject jsonObject = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
                 stringResponse = httpResponse.body();
             } else {
