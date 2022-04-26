@@ -1,6 +1,5 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import gsonAdapters.DurationAdapter;
 import gsonAdapters.LocalDateTimeAdapter;
 import org.junit.jupiter.api.AfterEach;
@@ -18,10 +17,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -41,12 +38,8 @@ class HTTPTaskServerTest {
 
 
     @BeforeEach
-    public void beforeEach() {
-        try {
-            kvServer = new KVServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void beforeEach() throws IOException {
+        kvServer = new KVServer();
         kvServer.start();
         httpTaskServer = new HTTPTaskServer();
         HTTPTaskServer.startTaskServer();
@@ -62,7 +55,7 @@ class HTTPTaskServerTest {
     }
 
     @Test
-    public void shouldHandleRequests() {
+    public void shouldHandleRequests() throws IOException, InterruptedException {
         Task task1 = new Task("name1", "descr1", 1, Status.NEW, "22.04.22 09:14", 17);
         Task task2 = new Task("name2", "descr2", 2, Status.NEW, "22.04.22 11:14", 34);
         EpicTask epicTask3 = new EpicTask(new Task("name3", "descr3", 3));
@@ -74,154 +67,98 @@ class HTTPTaskServerTest {
         List<Task> allTasks = List.of(task1, task2, epicTask3, subTask4, subTask5, epicTask6, subTask7);
 
         for (Task task : allTasks) {
-            try {
-                HttpResponse<String> httpResponse = client.send(getPOSTRequest(task)
-                        , HttpResponse.BodyHandlers.ofString());
-                assertEquals(201, httpResponse.statusCode());
-            } catch (NullPointerException | IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            HttpResponse<String> httpResponse = client.send(getPOSTRequest(task)
+                    , HttpResponse.BodyHandlers.ofString());
+            assertEquals(201, httpResponse.statusCode());
         }
 
         // GET id requests
         String pathAndQuery = "/tasks/task/?id=1";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(1)), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(1)), httpResponse.body());
         pathAndQuery = "/tasks/task/?id=6";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(6)), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(6)), httpResponse.body());
         pathAndQuery = "/tasks/task/?id=7";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(7)), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getSavedTaskByIdAndAffectHistory(7)), httpResponse.body());
 
         // GET regularTasks
         pathAndQuery = "/tasks/task/";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getRegularTasks()), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getRegularTasks()), httpResponse.body());
 
         // GET epicTasks
         pathAndQuery = "/tasks/epic/";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getEpicTasks()), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getEpicTasks()), httpResponse.body());
 
         // GET subtasks
         pathAndQuery = "/tasks/subtask/";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getSubTasks()), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getSubTasks()), httpResponse.body());
 
         // GET prioritizedTasks
         pathAndQuery = "/tasks/";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getPrioritizedTasks()), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(manager.getPrioritizedTasks()), httpResponse.body());
 
         // GET history
         pathAndQuery = "/tasks/history";
         InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) manager;
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(InMemoryHistoryManager.toStringOfIds(inMemoryTaskManager.getHistoryManager())), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
+        assertEquals(gson.toJson(InMemoryHistoryManager
+                .toStringOfIds(inMemoryTaskManager.getHistoryManager())), httpResponse.body());
 
         // GET subtasksFromEpic
         pathAndQuery = "/tasks/subtask/epic/?id=3";
-        try {
-            HttpResponse<String> httpResponse = client.send(getGETRequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(200, httpResponse.statusCode());
-            assertEquals(gson.toJson(manager.getSubTasksFromEpic(3)), httpResponse.body());
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getGETRequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, httpResponse.statusCode());
 
         // DELETE taskById
         pathAndQuery = "/tasks/task/?id=3";
-        try {
-            HttpResponse<String> httpResponse = client.send(getDELETERequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(204, httpResponse.statusCode());
-            assertNull(manager.getSavedTaskByIdAndAffectHistory(3));
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getDELETERequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, httpResponse.statusCode());
+        assertNull(manager.getSavedTaskByIdAndAffectHistory(3));
 
         // DELETE allRegularTasks
         pathAndQuery = "/tasks/task";
-        try {
-            HttpResponse<String> httpResponse = client.send(getDELETERequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(204, httpResponse.statusCode());
-            assertEquals(manager.getRegularTasks(), Collections.EMPTY_LIST);
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getDELETERequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, httpResponse.statusCode());
+        assertEquals(manager.getRegularTasks(), Collections.EMPTY_LIST);
 
         // DELETE allEpics
         pathAndQuery = "/tasks/epic";
-        try {
-            HttpResponse<String> httpResponse = client.send(getDELETERequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(204, httpResponse.statusCode());
-            assertEquals(manager.getEpicTasks(), Collections.EMPTY_LIST);
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getDELETERequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, httpResponse.statusCode());
+        assertEquals(manager.getEpicTasks(), Collections.EMPTY_LIST);
 
         // DELETE allSubtasks
         pathAndQuery = "/tasks/subtask/";
-        try {
-            HttpResponse<String> httpResponse = client.send(getDELETERequest(pathAndQuery)
-                    , HttpResponse.BodyHandlers.ofString());
-            assertEquals(204, httpResponse.statusCode());
-            assertEquals(manager.getSubTasks(), Collections.EMPTY_LIST);
-        } catch (NullPointerException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        httpResponse = client.send(getDELETERequest(pathAndQuery)
+                , HttpResponse.BodyHandlers.ofString());
+        assertEquals(204, httpResponse.statusCode());
+        assertEquals(manager.getSubTasks(), Collections.EMPTY_LIST);
     }
 
     private HttpRequest getDELETERequest(String pathAndQuery) {

@@ -29,8 +29,8 @@ public class HTTPTaskServer {
             .create();
 
     private static HistoryManager historyManager = Managers.getDefaultHistory();
-        private static TaskManager taskManager = Managers.getDefault(historyManager, "http://localhost:" + KVServer.PORT);
-//    private static TaskManager taskManager
+    private static TaskManager taskManager = Managers.getDefault(historyManager, "http://localhost:" + KVServer.PORT);
+    //    private static TaskManager taskManager
 //            = new FileBackedTasksManager(historyManager, Path.of("taskManagerData.csv"));
     private static HttpServer httpServer;
 
@@ -46,20 +46,16 @@ public class HTTPTaskServer {
 
 //            startTaskServer();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 
-    //todo
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
         startTaskServer();
-        try {
-            taskManager = FileBackedTasksManager.loadFromFile(Path.of("taskManagerData.csv"));
-            FileBackedTasksManager fileBackedTasksManager = (FileBackedTasksManager) taskManager;
-            historyManager = fileBackedTasksManager.getHistoryManager();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        taskManager = FileBackedTasksManager.loadFromFile(Path.of("taskManagerData.csv"));
+        FileBackedTasksManager fileBackedTasksManager = (FileBackedTasksManager) taskManager;
+        historyManager = fileBackedTasksManager.getHistoryManager();
     }
 
     public static void startTaskServer() {

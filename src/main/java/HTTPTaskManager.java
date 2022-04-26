@@ -11,7 +11,7 @@ import java.util.List;
 
 public class HTTPTaskManager extends FileBackedTasksManager {
     private final KVTaskClient kvTaskClient;
-    private static final Gson gson = new GsonBuilder()
+    private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .registerTypeAdapter(Duration.class, new DurationAdapter())
             .create();
