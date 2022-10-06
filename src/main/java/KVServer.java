@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import org.ietf.jgss.GSSContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
+/*
  * Постман: https://www.getpostman.com/collections/a83b61d9e1c81c10575c
  */
 
@@ -26,13 +25,11 @@ public class KVServer {
         server.createContext("/register", (h) -> {
             try {
                 System.out.println("\n/register");
-                switch (h.getRequestMethod()) {
-                    case "GET":
-                        sendText(h, API_KEY);
-                        break;
-                    default:
-                        System.out.println("/register ждёт GET-запрос, а получил " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                if ("GET".equals(h.getRequestMethod())) {
+                    sendText(h, API_KEY);
+                } else {
+                    System.out.println("/register ждёт GET-запрос, а получил " + h.getRequestMethod());
+                    h.sendResponseHeaders(405, 0);
                 }
             } finally {
                 h.close();
@@ -46,27 +43,25 @@ public class KVServer {
                     h.sendResponseHeaders(403, 0);
                     return;
                 }
-                switch (h.getRequestMethod()) {
-                    case "POST":
-                        String key = h.getRequestURI().getPath().substring("/save/".length());
-                        if (key.isEmpty()) {
-                            System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
-                            h.sendResponseHeaders(400, 0);
-                            return;
-                        }
-                        String value = readText(h);
-                        if (value.isEmpty()) {
-                            System.out.println("Value для сохранения пустой. value указывается в теле запроса");
-                            h.sendResponseHeaders(400, 0);
-                            return;
-                        }
-                        data.put(key, value);
-                        System.out.println("Значение для ключа " + key + " успешно обновлено!");
-                        h.sendResponseHeaders(200, 0);
-                        break;
-                    default:
-                        System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                if ("POST".equals(h.getRequestMethod())) {
+                    String key = h.getRequestURI().getPath().substring("/save/".length());
+                    if (key.isEmpty()) {
+                        System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
+                        h.sendResponseHeaders(400, 0);
+                        return;
+                    }
+                    String value = readText(h);
+                    if (value.isEmpty()) {
+                        System.out.println("Value для сохранения пустой. value указывается в теле запроса");
+                        h.sendResponseHeaders(400, 0);
+                        return;
+                    }
+                    data.put(key, value);
+                    System.out.println("Значение для ключа " + key + " успешно обновлено!");
+                    h.sendResponseHeaders(200, 0);
+                } else {
+                    System.out.println("/save ждёт POST-запрос, а получил: " + h.getRequestMethod());
+                    h.sendResponseHeaders(405, 0);
                 }
             } finally {
                 h.close();
@@ -80,26 +75,24 @@ public class KVServer {
                     h.sendResponseHeaders(403, 0);
                     return;
                 }
-                switch (h.getRequestMethod()) {
-                    case "GET":
-                        String key = h.getRequestURI().getPath().substring("/load/".length());
-                        if (key.isEmpty()) {
-                            System.out.println("Key пустой. key указывается в пути: /save/{key}");
-                            h.sendResponseHeaders(400, 0);
-                            return;
-                        }
-                        if (data.get(key) == null) {
-                            System.out.println("Такой ключ пока не внесен в хранилище");
-                            h.sendResponseHeaders(400, 0);
-                            return;
-                        }
-                        sendText(h, data.get(key));
-                        System.out.println("Значение для ключа " + key + " успешно отправлено!");
-                        h.sendResponseHeaders(200, 0);
-                        break;
-                    default:
-                        System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
-                        h.sendResponseHeaders(405, 0);
+                if ("GET".equals(h.getRequestMethod())) {
+                    String key = h.getRequestURI().getPath().substring("/load/".length());
+                    if (key.isEmpty()) {
+                        System.out.println("Key пустой. key указывается в пути: /save/{key}");
+                        h.sendResponseHeaders(400, 0);
+                        return;
+                    }
+                    if (data.get(key) == null) {
+                        System.out.println("Такой ключ пока не внесен в хранилище");
+                        h.sendResponseHeaders(400, 0);
+                        return;
+                    }
+                    sendText(h, data.get(key));
+                    System.out.println("Значение для ключа " + key + " успешно отправлено!");
+                    h.sendResponseHeaders(200, 0);
+                } else {
+                    System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+                    h.sendResponseHeaders(405, 0);
                 }
             } finally {
                 h.close();
@@ -133,7 +126,6 @@ public class KVServer {
     }
 
     protected void sendText(HttpExchange h, String text) throws IOException {
-        //byte[] resp = jackson.writeValueAsBytes(obj);
         text = gson.toJson(text);
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json");

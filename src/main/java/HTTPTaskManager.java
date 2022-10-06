@@ -30,13 +30,4 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         kvTaskClient.put("history", gson.toJson(InMemoryHistoryManager
                 .toStringOfIds(this.getHistoryManager())));
     }
-    /*
-     * Конструктор HTTPTaskManager должен будет вместо имени файла принимать URL к серверу KVServer.
-     *
-     *  Также HTTPTaskManager создаёт KVTaskClient, из которого можно получить исходное состояние менеджера.
-     *
-     * Вам нужно заменить вызовы сохранения состояния в файлах на вызов клиента.
-
-     * В конце обновите статический метод getDefault() в утилитарном классе Managers, чтобы он возвращал HTTPTaskManager.
-     * */
 }

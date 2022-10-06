@@ -1,11 +1,7 @@
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -31,8 +27,6 @@ public class KVTaskClient {
             HttpResponse<String> httpResponse = client.send(registerRequest
                     , HttpResponse.BodyHandlers.ofString());
             if (httpResponse.statusCode() == 200) {
-//                JsonObject jsonObject = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
-//                API_KEY = jsonObject.getAsString();
                 API_KEY = gson.fromJson(httpResponse.body(), String.class);
             } else {
                 System.out.println("Что-то пошло не так. Сервер вернул код состояния: "
@@ -71,32 +65,14 @@ public class KVTaskClient {
         try {
             final HttpResponse<String> httpResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
             if (httpResponse.statusCode() == 200) {
-                //JsonObject jsonObject = JsonParser.parseString(httpResponse.body()).getAsJsonObject();
                 stringResponse = httpResponse.body();
             } else {
                 System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + httpResponse.statusCode());
             }
-        } catch (NullPointerException | IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
+        } catch (NullPointerException | IOException | InterruptedException e) {
             System.out.println("Во время выполнения запроса возникла ошибка.\n" +
                     "Проверьте, пожалуйста, адрес и повторите попытку.");
         }
         return stringResponse;
     }
-    /*
-     * Конструктор принимает URL к серверу хранилища и регистрируется.
-     *  При регистрации выдаётся ключ (API_KEY), который нужен при работе с сервером.
-
-     * Метод void put(String key, String json) должен сохранять состояние менеджера задач
-     *  через запрос POST /save/<ключ>?API_KEY=.
-
-     * Метод String load(String key) должен возвращать состояние менеджера задач
-     *  через запрос GET /load/<ключ>?API_KEY=.
-     *
-     *
-     * Далее проверьте код клиента в main. Для этого запустите KVServer,
-     *  создайте экземпляр KVTaskClient. Затем сохраните значение под разными ключами и проверьте,
-     *  что при запросе возвращаются нужные данные. Удостоверьтесь, что если изменить значение,
-     *  то при повторном вызове вернётся уже не старое, а новое.
-     *
-     * */
 }

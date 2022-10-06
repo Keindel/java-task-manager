@@ -10,12 +10,12 @@ import java.util.List;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
     private final Path taskManagerDataFile;
-    
+
     public FileBackedTasksManager(HistoryManager historyManager) {
         super(historyManager);
         taskManagerDataFile = null;
     }
-    
+
     public FileBackedTasksManager(HistoryManager historyManager, Path taskManagerDataFile) {
         super(historyManager);
         this.taskManagerDataFile = taskManagerDataFile;
@@ -49,8 +49,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
         lines.remove(0);
         List<Integer> history = InMemoryHistoryManager
-                .fromString(lines.get(lines.size()-1));
-        lines.remove(lines.size()-1);
+                .fromString(lines.get(lines.size() - 1));
+        lines.remove(lines.size() - 1);
         lines.removeIf(String::isBlank);
 
         for (String line : lines) {
@@ -142,13 +142,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         Task testTask2 = new Task("name2", "descr2");
         fileBackedTasksManager.makeTask(testTask1);
         fileBackedTasksManager.makeTask(testTask2);
-//        System.out.println(fileBackedTasksManager.getTaskById(1));
-//        System.out.println(fileBackedTasksManager.getTaskById(2));
         // 1ый эпик для теста
         Task testTask3 = new Task("name3", "descr3");
         EpicTask testEpicTask3 = new EpicTask(testTask3);
         fileBackedTasksManager.makeTask(testEpicTask3);
-//        System.out.println(fileBackedTasksManager.getTaskById(3));
         // 2 подзадачи для 1го эпика
         Task testTask4 = new Task("name4", "descr4");
         Task testTask5 = new Task("name5", "descr5");
@@ -156,20 +153,14 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         SubTask subTask5 = new SubTask(testTask5, 3);
         fileBackedTasksManager.makeTask(subTask4);
         fileBackedTasksManager.makeTask(subTask5);
-//        System.out.println(fileBackedTasksManager.getTaskById(4));
-//        System.out.println(fileBackedTasksManager.getTaskById(5));
-//        System.out.println(fileBackedTasksManager.getTaskById(3));
         // 2ой эпик для теста
         Task testTask6 = new Task("name6", "descr6");
         EpicTask testEpicTask6 = new EpicTask(testTask6);
         fileBackedTasksManager.makeTask(testEpicTask6);
-//        System.out.println(fileBackedTasksManager.getTaskById(6));
         // 1 подзадача для 2го эпика
         Task testTask7 = new Task("name7", "descr7");
         SubTask subTask7 = new SubTask(testTask7, 6);
         fileBackedTasksManager.makeTask(subTask7);
-//        System.out.println(fileBackedTasksManager.getTaskById(7));
-//        System.out.println(fileBackedTasksManager.getTaskById(6));
 
         System.out.println("Список эпиков: " + fileBackedTasksManager.getEpicTasks());
         System.out.println("Список обычных задач: " + fileBackedTasksManager.getRegularTasks());
@@ -194,6 +185,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         System.out.println();
         System.out.println("История запросов: " + managerFromFile.getHistoryManager());
         // Краткий вид истории, по id
-            System.out.println("Краткий вид истории, по id: " + InMemoryHistoryManager.toStringOfIds(managerFromFile.getHistoryManager()));
+        System.out.println("Краткий вид истории, по id: "
+                + InMemoryHistoryManager.toStringOfIds(managerFromFile.getHistoryManager()));
     }
 }

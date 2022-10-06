@@ -10,7 +10,6 @@ public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Task> tasks;
     private Map<Integer, SubTask> subTasks;
     private Map<Integer, EpicTask> epicTasks;
-    // Объявляем переменную менеджера историй
     private HistoryManager historyManager;
     private Set<Task> tasksAndSubtasksPrioritizedSet;
     private Set<Long> scheduleSet;
@@ -34,8 +33,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     /*
-        Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
-        */
+    * Метод для создания-сохранения задачи в зависимости от класса переданного объекта (от типа задачи)
+    */
     @Override
     public void makeTask(Task task) {
         if (task == null) {
@@ -213,7 +212,7 @@ public class InMemoryTaskManager implements TaskManager {
             tasksAndSubtasksPrioritizedSet.remove(subTasks.remove(subTaskId));
         }
         // Удаляем ссылки на SubTask'и в списке подзадач Epic'a
-        subList.clear(); //epicTasks.get(id).clearEpicSublist();
+        subList.clear();
         // Удаляем сам Epic из HashMap;
         historyManager.remove(id);
         tasksAndSubtasksPrioritizedSet.remove(epicTasks.remove(id));

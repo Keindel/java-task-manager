@@ -30,8 +30,6 @@ public class HTTPTaskServer {
 
     private static HistoryManager historyManager = Managers.getDefaultHistory();
     private static TaskManager taskManager = Managers.getDefault(historyManager, "http://localhost:" + KVServer.PORT);
-    //    private static TaskManager taskManager
-//            = new FileBackedTasksManager(historyManager, Path.of("taskManagerData.csv"));
     private static HttpServer httpServer;
 
     public static TaskManager getTaskManager() {
@@ -44,7 +42,6 @@ public class HTTPTaskServer {
             httpServer.bind(new InetSocketAddress(PORT), 0);
             httpServer.createContext("/tasks", new TasksHandler());
 
-//            startTaskServer();
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -81,7 +78,6 @@ public class HTTPTaskServer {
             String uriQuery = requestUri.getQuery();
 
             String endpoint = requestMethod + path;
-//            String[] splittedPath = path.split("/");
 
             int id = 0;
             if (uriQuery != null && !uriQuery.isBlank()) {
@@ -117,7 +113,6 @@ public class HTTPTaskServer {
                     response = gson.toJson(taskManager.getPrioritizedTasks());
                     break;
                 case "GET/tasks/history":
-//                    response = gson.toJson(historyManager.getHistory());
                     response = gson.toJson(InMemoryHistoryManager.toStringOfIds(historyManager));
                     break;
                 case "GET/tasks/subtask/epic/?id":

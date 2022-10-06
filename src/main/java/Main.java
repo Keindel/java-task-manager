@@ -11,9 +11,6 @@ public class Main {
         HTTPTaskServer.startTaskServer();
 
         // Тестирование приложения
-//        HistoryManager historyManager = Managers.getDefaultHistory();
-//        TaskManager taskManager = Managers.getDefault(historyManager, url);
-//        TaskManager taskManager = Managers.getDefault(historyManager);
         TaskManager taskManager = HTTPTaskServer.getTaskManager();
         // 2 задачи для теста
         Task testTask1 = new Task("", "");
