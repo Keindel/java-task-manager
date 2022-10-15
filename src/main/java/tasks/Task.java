@@ -100,15 +100,14 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.join(","
-                , String.valueOf(id)
-                , taskType.toString()
-                , name
-                , status.toString()
-                , description
-                , startTime.format(getDateTimeFormatter())
-                , String.valueOf(duration.toMinutes())
-                , getEndTime().format(getDateTimeFormatter()));
+        return String.join(",",
+                String.valueOf(id), taskType.toString(),
+                name,
+                status.toString(),
+                description,
+                startTime.format(getDateTimeFormatter()),
+                String.valueOf(duration.toMinutes()),
+                getEndTime().format(getDateTimeFormatter()));
     }
 
     public int getId() {
